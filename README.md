@@ -295,7 +295,7 @@ Note that the returned JSON may not match the body property exactly, as it will 
 * Requires [Apache Maven 3.0](http://maven.apache.org/)
 * To build all components:
 
-    mvn clean install
+    `mvn clean install`
 
 ## Creating Eclipse projects
 
