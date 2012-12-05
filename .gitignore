@@ -1,0 +1,9 @@
+/target/
+/*/target/
+/*/.project
+/*/.classpath
+/*/.settings/
+/grails/classes
+*.iml
+/.idea
+
