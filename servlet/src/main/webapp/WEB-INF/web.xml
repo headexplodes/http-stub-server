@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" version="2.5">
+
+    <display-name>Generic HTTP Stub</display-name>
+    <description>Generic HTTP stub server for acceptance testing</description>
+
+    <listener>
+        <listener-class>au.com.sensis.stubby.servlet.StubContextListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>RequestServlet</servlet-name>
+        <servlet-class>au.com.sensis.stubby.servlet.RequestServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>RequestsServlet</servlet-name>
+        <servlet-class>au.com.sensis.stubby.servlet.RequestsServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ResponseServlet</servlet-name>
+        <servlet-class>au.com.sensis.stubby.servlet.ResponseServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ResponsesServlet</servlet-name>
+        <servlet-class>au.com.sensis.stubby.servlet.ResponsesServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>MatcherServlet</servlet-name>
+        <servlet-class>au.com.sensis.stubby.servlet.MatcherServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>RequestServlet</servlet-name>
+        <url-pattern>/_control/requests/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>RequestsServlet</servlet-name>
+        <url-pattern>/_control/requests</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ResponseServlet</servlet-name>
+        <url-pattern>/_control/responses/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ResponsesServlet</servlet-name>
+        <url-pattern>/_control/responses</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>MatcherServlet</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>

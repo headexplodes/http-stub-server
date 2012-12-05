@@ -1,0 +1,16 @@
+GET      /public/                               staticDir:public
+
+GET      /_last                                 GenericStubController.last
+GET      /_requests/{index}                     GenericStubController.last
+POST     /_stub                                 GenericStubController.stub
+POST     /_reset                                GenericStubController.reset
+
+GET      /_control/requests                     GenericStubController.list
+GET      /_control/requests/{index}             GenericStubController.last
+PUT      /_control/responses                    GenericStubController.stub
+DELETE   /_control/responses                    GenericStubController.reset
+
+GET      /_control/ui                           Main.index
+POST     /_control/ui/upload                    Main.upload
+
+*        /{<.*>_ignore}                         GenericStubController.match

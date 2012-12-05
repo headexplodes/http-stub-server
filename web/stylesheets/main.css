@@ -1,0 +1,100 @@
+.path, .header, .param, .method, .content-type {
+    display: inline-block;
+    font-family: monospace;
+    padding: .3em .5em;
+    margin: .2em;
+    border-radius: 5px;
+}
+
+.path {
+    border: 1px solid black;
+    background-color: white;
+    color: black;
+}
+
+.method {
+    border: 1px solid black;
+    background-color: black;
+    color: white;
+}
+
+.content-type {
+    border: 1px solid #999;
+    background-color: #999;
+    color: white;
+}
+
+.header {
+    background-color: #3366FF; /* blue */
+    border: 1px solid #3366FF;
+    color: white;
+}
+
+.param {
+    background-color: #009933; /* green */
+    border: 1px solid #009933;
+    color: white;
+}
+
+.expand-response {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: .5em;
+}
+
+.expand-response:hover,
+.expand-response.expanded {
+    background-color: #ddd;
+}
+
+.expand-response:hover {
+    cursor: pointer;
+}
+
+ul.responses,
+ul.requests {
+    list-style-type: none;  
+    padding-left: 0;
+}
+
+.response {
+    display: none;
+    font-family: monospace;
+    padding: .5em;
+    border: 2px solid #ddd;
+}
+
+.response-error {
+    font-weight: normal;
+    font-family: serif;
+    color: white;
+    background-color: red;
+    border-radius: 5px;
+    margin-bottom: .5em;
+    padding: .1em .3em;
+}
+
+.response-body {
+    font-family: monospace;
+    white-space: pre;
+    margin-top: 1em;
+}
+
+.json-boolean,
+.json-number,
+.json-string {
+    color: blue;
+    font-weight: bold;  
+}
+
+.json-string {
+    color: green;
+    font-weight: bold;
+}
+
+.json-key {
+    color: #666;
+}
+
+

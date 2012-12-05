@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Responses</title>
+        <link rel="stylesheet" media="screen" href="@{'/public/stylesheets/main.css'}">
+        <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
+        <script src="@{'/public/javascripts/jquery-1.5.2.min.js'}" type="text/javascript"></script>
+        <style>
+        
+            .path,
+            .header,
+            .param,
+            .method,
+            .content-type {
+                display: inline-block;
+                font-family: monospace;
+                padding: .3em .5em;
+                margin: .2em 0;
+                border-radius: 5px;
+            }
+            
+            .path { 
+                border: 1px solid black;
+                background-color: white;
+                color: black;
+             }
+             
+             .method { 
+                border: 1px solid black;
+                background-color: black;
+                color: white;
+             }
+             
+             .content-type { 
+                border: 1px solid #999;
+                background-color: #999;
+                color: white;
+             }
+             
+             .header {
+                background-color: #3366FF; /* blue */
+                border: 1px solid #3366FF;
+                color: white;
+             }
+             
+            .param {
+                background-color: #009933; /* green */
+                border: 1px solid #009933;
+                color: white;
+             }
+           
+             .expand-response {
+                display: block;
+                text-decoration: none;
+                color: inherit;
+                padding: .5em;
+             }
+           
+             .expand-response:hover {
+                background-color: #ddd;
+             }
+             
+             .response {
+                font-family: monospace;  
+             }
+             
+             .response-body {
+                font-family: monospace;
+                white-space: pre;
+             }
+           
+            
+        </style>
+    </head>
+    <body>
+        
+        <h1>Stubbed Responses</h1>
+        <p>Found ${responses.size} stubbed response(s)</p>
+        
+        <ul class="responses">
+            #{list items:responses, as:'response' }
+                <li>
+                    <a href="#" class="expand-response">
+                        #{if response.request.method}
+                            <div class="method">${response.request.method}</div>
+                        #{/if}
+                        <div class="path">${response.request.path}</div> 
+                        #{if response.request.contentType}
+                            <div class="content-type">${response.request.contentType}</div> 
+                        #{/if}
+                        #{if response.request.params.size > 0}
+                            #{list items:response.request.params, as:'pattern' }
+                                <div class="param">${pattern.name}=${pattern.pattern}</div>
+                            #{/list}
+                        #{/if}
+                        #{if response.request.headers.size > 0}
+                            #{list items:response.request.headers, as:'pattern' }
+                                <div class="header">${pattern.name}: ${pattern.pattern}</div>
+                            #{/list}
+                        #{/if}
+                    </a>
+                    <div class="response">
+                        <div class="status-code">${response.response.statusCode}</div>
+                        <div class="reason-phrase">${response.response.reasonPhrase}</div>
+                        #{list items:response.response.headersPretty, as:'header' }
+                            <div class="response-header">${header.name}: ${header.value}</div>
+                        #{/list}
+                        #{if response.response.contentType}
+                            <div class="response-header">content-type: ${response.response.contentType}</div> 
+                        #{/if}
+                        #{if response.response.body}
+                            <div class="response-body">${response.response.formattedBody}</div> 
+                        #{/if}
+                    </div>
+                </li>
+            #{/list}
+        </ul>
+        
+        <h1>Upload stub messages</h1>
+        
+        <form action="@{Main.upload}" method="POST" enctype="multipart/form-data">
+          <label for="upload-files">Files: </label>
+          <input id="upload-files" name="files" type="file" multiple="multiple">
+          <input type="submit" value="Upload">
+        </form>
+
+    </body>
+</html>

@@ -1,0 +1,9 @@
+{
+    "request": {
+        "path": "/foo/bar"
+    },
+    "response": {
+        "statusCode": 200,
+        "body": "Sup?"
+    }
+}

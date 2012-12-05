@@ -1,0 +1,20 @@
+require:
+    - play
+    - org.apache.httpcomponents -> httpclient 4.1.1
+    - org.codehaus.jackson -> jackson-mapper-asl 1.9.7
+    - sensis -> generic-http-stub-server-core
+        
+repositories:
+
+    - jboss:
+        type: iBiblio
+        root: "http://maven.sensis.com.au:8081/nexus/content/groups/public"
+        contains:
+            - org.apache.httpcomponents -> *
+            - org.codehaus.jackson -> *
+
+    - core:
+        type: local
+        artifact: ${application.path}/../[module]/dist/[module]-[version].jar
+        contains:
+            - generic-http-stub-server-core
