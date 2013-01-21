@@ -1,6 +1,7 @@
 package au.com.sensis.stubby;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,15 +11,18 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import au.com.sensis.stubby.MatchResult.Field;
 
-public class StubbedResponse {
+public class StubbedResponse implements Serializable {
+
+    private static final long serialVersionUID = -1l;
 
     private static final Logger LOGGER = Logger.getLogger(StubbedResponse.class);
 
-    private RequestPattern request = new RequestPattern();
+    private transient RequestPattern request = new RequestPattern();
     private HttpResponse response = new HttpResponse();
     private Long delay; // milliseconds
+    private String script; //JavaScript statement to execute
     
-    private List<MatchResult> attempts = new ArrayList<MatchResult>();
+    private transient List<MatchResult> attempts = new ArrayList<MatchResult>();
 
     @JsonProperty
     public void setRequest(HttpRequest message) throws IOException {
@@ -59,6 +63,14 @@ public class StubbedResponse {
 
     public void setDelay(Long delay) {
         this.delay = delay;
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
     }
 
     @Override

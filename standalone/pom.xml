@@ -47,7 +47,6 @@
                     <execution>
                        <configuration>
                             <attachToBuild>true</attachToBuild>
-                            <!-- Optional, default is "onejar" -->
                             <classifier>onejar</classifier>
                         </configuration>
                         <goals>
@@ -58,12 +57,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>onejar-maven-plugin.googlecode.com</id>
-            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
-        </pluginRepository>
-    </pluginRepositories>
 
 </project>

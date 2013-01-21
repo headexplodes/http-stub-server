@@ -215,7 +215,8 @@ This object is used by the `/_control/responses` endpoints and represents a stub
     {
         "request": <HTTP Request>,
         "response": <HTTP Response>,
-        "delay": <integer>
+        "delay": <integer>,
+        "script": <string>
     }
 
 Field details:
@@ -235,6 +236,10 @@ Field details:
 * `delay`
 
   Integer representing a number of milliseconds to delay the response by. If not provided (or `null`) no delay will be used.
+
+* `script`
+
+  JavaScript code to execute when this request is matched. Can be used to dynamically modify the output based on input parameters, for example (more details to come).
 
 ### Body Patterns
 

@@ -18,7 +18,7 @@ public abstract class TestBase {
 
     @Before
     public void before() {
-        client = new Client("http://localhost:8080"); // TODO: make configurable...
+        client = new Client("http://localhost:9001"); // TODO: make configurable...
         client.reset();
     }
 

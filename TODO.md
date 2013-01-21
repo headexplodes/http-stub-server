@@ -12,4 +12,4 @@
 Github TODO:
  - Add Ruby client code
  - Add some downloadable artefacts?
-
+ - Document JavaScript support

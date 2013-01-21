@@ -1,10 +1,13 @@
 package au.com.sensis.stubby;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Param {
+public abstract class Param implements Serializable {
 
+    private static final long serialVersionUID = 1L; // don't care
+    
     private String name;
     private List<String> values = new ArrayList<String>();
 
@@ -38,6 +41,10 @@ public abstract class Param {
 
     public void setValues(List<String> values) {
         this.values = values;
+    }
+
+    public String toString() {
+        return values.toString();
     }
 
 }

@@ -22,9 +22,14 @@ public class Server implements HttpHandler {
     private static final Logger LOGGER = Logger.getLogger(Server.class);
 
     private StubService service = new StubService();
+    private Thread shutdownHook; // if set, use for graceful shutdown
     
     private ObjectMapper mapper() {
         return new ObjectMapper();
+    }
+  
+    public void setShutdownHook(Thread shutdownHook) {
+        this.shutdownHook = shutdownHook;
     }
 
     public void handle(HttpExchange exchange) {
@@ -48,7 +53,7 @@ public class Server implements HttpHandler {
         } finally {
             exchange.close();
         }
-        LOGGER.info("Server handle processing time(ms): " + (System.currentTimeMillis() - start));
+        LOGGER.trace("Server handle processing time(ms): " + (System.currentTimeMillis() - start));
     }
         
     private void handleMatch(HttpExchange exchange) throws Exception {
@@ -86,6 +91,8 @@ public class Server implements HttpHandler {
                     handleRequests(exchange);
                 } else if (object.equals("responses")) {
                     handleResponses(exchange);
+                } else if (object.equals("shutdown")) {
+                    handleShutdown(exchange);
                 } else {
                     throw new RuntimeException("Unknown object: " + object);
                 }
@@ -177,6 +184,17 @@ public class Server implements HttpHandler {
             }   
         } else {
             throw new RuntimeException("Unsupported method: " + method);
+        }
+    }
+    
+    private void handleShutdown(HttpExchange exchange) throws IOException {
+        if (shutdownHook != null) {
+            LOGGER.info("Received shutdown request, attempting to shutdown gracefully...");
+            returnOk(exchange);
+            shutdownHook.start(); // attempt graceful shutdown
+        } else {
+            LOGGER.error("Received shutdown request, but don't know how to shutdown gracefully! (ignoring)");
+            returnError(exchange, "Graceful shutdown not supported");
         }
     }
 

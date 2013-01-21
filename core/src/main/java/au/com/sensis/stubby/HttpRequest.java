@@ -12,6 +12,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class HttpRequest extends HttpMessage {
 
+    private static final long serialVersionUID = 1L; // don't care
+    
     private String method; // always upper-case
     private String path;
     private Map<String, HttpParam> params = new HashMap<String, HttpParam>();

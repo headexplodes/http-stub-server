@@ -1,5 +1,6 @@
 package au.com.sensis.stubby;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,9 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import au.com.sensis.stubby.utils.MessageUtils;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public abstract class HttpMessage {
+public abstract class HttpMessage implements Serializable {
+
+    private static final long serialVersionUID = 1L; // don't care
 
     public static final String H_CONTENT_TYPE = "content-type";
 

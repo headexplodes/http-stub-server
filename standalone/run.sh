@@ -24,5 +24,5 @@ java \
     '-Djavax.net.ssl.keyStorePassword=password' \
     -jar $JAR \
     $HTTP_PORT \
-    $HTTPS_PORT \
+    $HTTPS_PORT
 

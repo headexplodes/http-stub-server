@@ -10,5 +10,5 @@ public class FooTest extends TestBase {
         postFile("fooBar.json");
         assertOk(new HttpGet(makeUri("/foo/bar")));
     }
-    
+
 }

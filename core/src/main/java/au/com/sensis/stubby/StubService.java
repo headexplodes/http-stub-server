@@ -5,6 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.SimpleScriptContext;
+
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -50,8 +54,11 @@ public class StubService {
             for (StubbedResponse stubbedResponse : responses) {
                 if (stubbedResponse.matches(request)) {
                     LOGGER.info("Matched: " + request.getPath() + "");
+
+                    HttpResponse processedHttpResponse = applyScript(request, stubbedResponse);
+
                     return new Pair<HttpResponse,Long>(
-                            stubbedResponse.getResponse(), 
+                            processedHttpResponse,
                             stubbedResponse.getDelay());
                 }
             }
@@ -60,6 +67,27 @@ public class StubService {
         } catch (Exception e) {
             throw new RuntimeException("Error matching request", e);
         }
+    }
+
+    // TODO: move into a separate class (and add some unit tests to test objects can be accessed etc.)
+    private HttpResponse applyScript(HttpRequest request, StubbedResponse stubbedResponse) throws Exception {
+        if (stubbedResponse.getScript() == null) {
+            return stubbedResponse.getResponse();
+        }
+
+        HttpResponse processedResponse = stubbedResponse.getResponse().deepClone();
+
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("JavaScript");
+        engine.setContext(new SimpleScriptContext());
+
+        engine.put("request", request);
+        engine.put("response", processedResponse);
+
+        LOGGER.info("Executing script...");
+        engine.eval(stubbedResponse.getScript());
+
+        return processedResponse;
     }
 
     public synchronized StubbedResponse getResponse(int index) throws NotFoundException {
