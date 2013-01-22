@@ -1,0 +1,100 @@
+<project name="generate-keys" basedir="." default="generate-keys">
+
+    <property name="keys.dir" value="${basedir}/target"/>
+
+    <property name="keystore.file" value="${keys.dir}/keystore.jks"/>
+    <property name="keystore.password" value="changeit"/>
+
+    <property name="truststore.file" value="${keys.dir}/truststore.jks"/>
+
+    <property name="cert.file" value="${keys.dir}/cert.cer"/>
+    <property name="cert.alias" value="certificatekey"/>
+    <property name="cert.validity" value="365"/>
+    <property name="cert.password" value="changeit"/>
+    <property name="cert.dname" value="cn=localhost, ou=Development, o=Sensis, l=Melbourne, st=VIC, c=AU"/>
+
+    <target name="generate-keys" depends="truststore-generate"/>
+
+    <target name="-init">
+        <mkdir dir="${keys.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete file="${keystore.file}"/>
+        <delete file="${truststore.file}"/>
+        <delete file="${cert.file}"/>
+    </target>
+
+    <macrodef name="keytool">
+        <attribute name="keystore"/>
+        <element name="args" implicit="true"/>
+        <sequential>
+            <exec executable="keytool">
+                <arg value="-noprompt"/>
+                <arg value="-keystore"/>
+                <arg file="@{keystore}"/>
+                <arg line="-keypass ${keystore.password}"/>
+                <arg line="-storepass ${keystore.password}"/>
+                <arg line="-alias ${cert.alias}"/>
+                <args/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <target name="-check-keystore-uptodate">
+        <available property="keystore.uptodate" file="${keystore.file}" type="file"/>
+    </target>
+
+    <target name="-check-cert-uptodate">
+        <uptodate property="cert.uptodate" srcfile="${keystore.file}" targetfile="${cert.file}"/>
+    </target>
+
+    <target name="-check-truststore-uptodate">
+        <uptodate property="truststore.uptodate" srcfile="${cert.file}" targetfile="${truststore.file}"/>
+    </target>
+
+    <target name="keystore-generate" depends="-init, -check-keystore-uptodate" unless="keystore.uptodate">
+        <echo message="Generating keystore: ${keystore.file}..."/>
+        <keytool keystore="${keystore.file}">
+            <arg value="-genkeypair"/>
+            <arg line="-keyalg RSA"/>
+            <arg line="-validity ${cert.validity}"/>
+            <arg value="-dname"/>
+            <arg value="${cert.dname}"/>
+        </keytool>
+    </target>
+
+    <target name="keystore-export-cert" depends="keystore-generate, -check-cert-uptodate" unless="cert.uptodate">
+        <echo message="Exporting certificate: ${cert.file}..."/>
+        <keytool keystore="${keystore.file}">
+            <arg value="-export"/>
+            <arg value="-rfc"/>
+            <arg value="-file"/>
+            <arg line="${cert.file}"/>
+        </keytool>
+    </target>
+
+    <target name="truststore-generate" depends="keystore-export-cert, -check-truststore-uptodate" unless="truststore.uptodate">
+        <echo message="Generating truststore: ${truststore.file}..."/>
+        <keytool keystore="${truststore.file}">
+            <arg value="-import"/>
+            <arg value="-file"/>
+            <arg line="${cert.file}"/>
+        </keytool>
+    </target>
+
+    <target name="truststore-list">
+        <keytool keystore="${truststore.file}">
+            <arg value="-list"/>
+            <arg value="-v"/>
+        </keytool>
+    </target>
+
+    <target name="keystore-list">
+        <keytool keystore="${keystore.file}">
+            <arg value="-list"/>
+            <arg value="-v"/>
+        </keytool>
+    </target>
+
+</project>
