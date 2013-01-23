@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.ObjectWriter;
+
+import au.com.sensis.stubby.http.HttpMessage;
+import au.com.sensis.stubby.utils.JsonUtils;
 
 public class JsonBodyPattern extends BodyPattern {
     
@@ -36,14 +37,13 @@ public class JsonBodyPattern extends BodyPattern {
         this.pattern = pattern;
     }
     
+    public Object getPattern() {
+        return pattern;
+    }
+    
     @Override
     public String expectedValue() {
-        ObjectWriter writer = new ObjectMapper().writerWithDefaultPrettyPrinter(); // TODO: write a utility function for this...
-        try {
-            return writer.writeValueAsString(pattern); // write pretty
-        } catch (Exception e) {
-            throw new RuntimeException("Error attempting to write JSON content", e); 
-        }
+        return JsonUtils.prettyPrint(pattern); // write pretty
     }
     
     // this method adheres to the 'BodyPattern' interface (but provides less useful information...)
@@ -65,7 +65,7 @@ public class JsonBodyPattern extends BodyPattern {
      */
     public MatchResult matchResult(HttpMessage request) {
         if (request.isJson() && request.getBody() != null) { // assert that request _has_ a body
-            return matchValue(pattern,  request.bodyAsJson(), ""); // root could be any type (eg, an array)
+            return matchValue(pattern, request.bodyAsJson(), ""); // root could be any type (eg, an array)
         } else {
             return matchFailure("Expected content type: application/json", ".");
         }

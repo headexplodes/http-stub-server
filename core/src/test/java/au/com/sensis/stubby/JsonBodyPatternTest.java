@@ -6,9 +6,13 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
+import au.com.sensis.stubby.http.HttpMessage;
+import au.com.sensis.stubby.http.HttpRequest;
+import au.com.sensis.stubby.utils.JsonUtils;
+
 public class JsonBodyPatternTest {
     
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = JsonUtils.defaultMapper();
     
     private Object parse(String json) {
         try {
@@ -18,8 +22,8 @@ public class JsonBodyPatternTest {
         }
     }
 
-    private HttpMessage message(String bodyJson) {
-        HttpMessage message = new HttpRequest();
+    private HttpRequest message(String bodyJson) {
+        HttpRequest message = new HttpRequest();
         message.setBody(parse(bodyJson));
         message.setContentType("application/json");
         return message;

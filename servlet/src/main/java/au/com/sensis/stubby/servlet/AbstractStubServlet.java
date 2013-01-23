@@ -13,6 +13,7 @@ import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import au.com.sensis.stubby.StubService;
+import au.com.sensis.stubby.utils.JsonUtils;
 
 /*
  * Base servlet class that provides access to a 'StubService' instance
@@ -22,7 +23,7 @@ public abstract class AbstractStubServlet extends HttpServlet {
 
     public static final String SERVICE_CONTEXT_KEY = "stubby.StubService";
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = JsonUtils.defaultMapper();
     
     protected StubService service() {
         StubService service = (StubService) getServletContext().getAttribute(SERVICE_CONTEXT_KEY);

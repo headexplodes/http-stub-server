@@ -8,10 +8,11 @@ import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import au.com.sensis.stubby.HttpResponse;
 import au.com.sensis.stubby.NotFoundException;
 import au.com.sensis.stubby.StubService;
-import au.com.sensis.stubby.StubbedResponse;
+import au.com.sensis.stubby.StubExchange;
+import au.com.sensis.stubby.http.HttpResponse;
+import au.com.sensis.stubby.utils.JsonUtils;
 import au.com.sensis.stubby.utils.Pair;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -25,7 +26,7 @@ public class Server implements HttpHandler {
     private Thread shutdownHook; // if set, use for graceful shutdown
     
     private ObjectMapper mapper() {
-        return new ObjectMapper();
+        return JsonUtils.defaultMapper();
     }
   
     public void setShutdownHook(Thread shutdownHook) {
@@ -136,7 +137,7 @@ public class Server implements HttpHandler {
     private void handleResponses(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         if (method.equals("POST")) {
-            StubbedResponse stubbedResponse = parseJsonBody(exchange, StubbedResponse.class);
+            StubExchange stubbedResponse = parseJsonBody(exchange, StubExchange.class);
             service.addResponse(stubbedResponse);
             returnOk(exchange);
         } else if (method.equals("DELETE")) {

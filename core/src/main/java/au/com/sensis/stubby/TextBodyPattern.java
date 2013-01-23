@@ -2,6 +2,8 @@ package au.com.sensis.stubby;
 
 import java.util.regex.Pattern;
 
+import au.com.sensis.stubby.http.HttpMessage;
+
 public class TextBodyPattern extends BodyPattern {
         
     private static final Pattern TEXT_CONTENT_TYPE = Pattern.compile("text/.*");
@@ -17,7 +19,7 @@ public class TextBodyPattern extends BodyPattern {
         return contentType != null 
                 && TEXT_CONTENT_TYPE.matcher(contentType).matches();
     }
-        
+
     @Override
     public String expectedValue() {
         return "m/" + pattern.pattern() + "/";
@@ -42,5 +44,9 @@ public class TextBodyPattern extends BodyPattern {
     public int hashCode() {
         return pattern.pattern().hashCode();
     }
-    
+
+    public Pattern getPattern() {
+        return pattern;
+    }
+
 }

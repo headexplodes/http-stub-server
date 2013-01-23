@@ -9,7 +9,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
 
-import au.com.sensis.stubby.HttpMessage;
+import au.com.sensis.stubby.http.HttpMessage;
 
 public class MessageUtils {
     
@@ -68,8 +68,8 @@ public class MessageUtils {
         String contentType = message.getContentType();
         Object body = message.getBody();
         if (contentType != null && contentType.startsWith("application/json")) {
-            ObjectMapper mapper = new ObjectMapper();
-            ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+            ObjectMapper mapper = JsonUtils.defaultMapper();
+            ObjectWriter writer = JsonUtils.prettyWriter();
             if (message.getBody() instanceof String) {
                 try {
                     return writer.writeValueAsString(mapper.readValue(body.toString(), Map.class)); // read-and-write pretty

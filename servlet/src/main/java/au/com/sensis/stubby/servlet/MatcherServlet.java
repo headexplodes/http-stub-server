@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import au.com.sensis.stubby.HttpResponse;
+import au.com.sensis.stubby.http.HttpResponse;
 import au.com.sensis.stubby.utils.Pair;
 
 /*

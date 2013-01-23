@@ -1,5 +1,7 @@
 package au.com.sensis.stubby;
 
+import au.com.sensis.stubby.http.HttpMessage;
+
 public final class EmptyBodyPattern extends BodyPattern { 
     
     @Override

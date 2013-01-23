@@ -1,20 +1,18 @@
 package au.com.sensis.stubby.standalone;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 
-import au.com.sensis.stubby.HttpHeader;
-import au.com.sensis.stubby.HttpParam;
-import au.com.sensis.stubby.HttpRequest;
-import au.com.sensis.stubby.HttpResponse;
+import au.com.sensis.stubby.http.HttpParam;
+import au.com.sensis.stubby.http.HttpParamSet;
+import au.com.sensis.stubby.http.HttpRequest;
+import au.com.sensis.stubby.http.HttpResponse;
+import au.com.sensis.stubby.utils.JsonUtils;
 
 import com.sun.net.httpserver.HttpExchange;
 
@@ -23,33 +21,21 @@ import com.sun.net.httpserver.HttpExchange;
  */
 public class Transformer {
 
-    public static List<HttpHeader> fromExchangeHeaders(HttpExchange exchange) {
-        List<HttpHeader> result = new ArrayList<HttpHeader>();
+    public static HttpParamSet fromExchangeHeaders(HttpExchange exchange) {
+        HttpParamSet result = new HttpParamSet();
         for (Map.Entry<String, List<String>> entry : exchange.getRequestHeaders().entrySet()) {
-            String headerName = entry.getKey();
-            HttpHeader header = new HttpHeader();
-            header.setName(headerName.toLowerCase()); // all header names should be lower-cased
-            for (String value : entry.getValue()) {
-                header.getValues().add(value); 
-            }
-            result.add(header);
+            result.add(entry.getKey().toLowerCase(), entry.getValue()); // all header names should be lower-cased
         }
         return result;
     }
 
-    public static List<HttpParam> fromExchangeParams(HttpExchange exchange) {
+    public static HttpParamSet fromExchangeParams(HttpExchange exchange) {
         List<NameValuePair> params = URLEncodedUtils.parse(exchange.getRequestURI(), "UTF-8");
-        Map<String,HttpParam> result = new HashMap<String,HttpParam>();
+        HttpParamSet result = new HttpParamSet();
         for (NameValuePair pair : params) {
-            HttpParam param = result.get(pair.getName());
-            if (param == null) {
-                param = new HttpParam();
-                param.setName(pair.getName());
-                result.put(pair.getName(), param);
-            }
-            param.getValues().add(pair.getValue() == null ? "" : pair.getValue());
+            result.add(pair.getName(), pair.getValue());
         }
-        return new ArrayList<HttpParam>(result.values());
+        return result;
     }
 
     public static HttpRequest fromExchange(HttpExchange exchange) {
@@ -64,17 +50,13 @@ public class Transformer {
                 throw new RuntimeException(e);
             }
         }
-        for (HttpParam param : fromExchangeParams(exchange)) {
-            result.getParams().put(param.getName(), param);
-        }
-        for (HttpHeader header : fromExchangeHeaders(exchange)) {
-            result.getHeadersMap().put(header.getName(), header);
-        }
+        result.setParams(fromExchangeParams(exchange));
+        result.setHeaders(fromExchangeHeaders(exchange));
         return result;
     }
 
     public static void populateExchange(HttpResponse message, HttpExchange exchange) throws IOException {
-        for (HttpHeader header : message.getHeadersMap().values()) {
+        for (HttpParam header : message.getHeadersMap().values()) {
             for (String value : header.getValues()) {
                 exchange.getResponseHeaders().add(header.getName(), value);
             }
@@ -83,7 +65,7 @@ public class Transformer {
         if (message.getBody() instanceof String) {
             IOUtils.write(message.getBody().toString(), exchange.getResponseBody());
         } else {
-            new ObjectMapper().writeValue(exchange.getResponseBody(), message.getBody()); // assume deserialised JSON (ie, a Map) 
+            new JsonUtils.defaultMapper().writeValue(exchange.getResponseBody(), message.getBody()); // assume deserialised JSON (ie, a Map) 
         }
         exchange.getResponseBody().close();
     }

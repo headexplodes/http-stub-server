@@ -19,8 +19,9 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.codehaus.jackson.type.TypeReference;
+
+import au.com.sensis.stubby.utils.JsonUtils;
 
 public class Client {
 
@@ -32,8 +33,7 @@ public class Client {
         try {
             this.baseUri = new URI(baseUri);
             this.httpClient = new DefaultHttpClient();
-            this.objectMapper = new ObjectMapper();
-            this.objectMapper.setSerializationInclusion(Inclusion.NON_NULL);
+            this.objectMapper = JsonUtils.defaultMapper();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Invalid URI", e);
         }

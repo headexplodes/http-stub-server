@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import au.com.sensis.stubby.utils.JsonUtils;
 
 public class MatchResult implements Comparable<MatchResult> {
 
@@ -91,7 +91,7 @@ public class MatchResult implements Comparable<MatchResult> {
         @Override
         public String toString() {
             try {
-                return new ObjectMapper().writeValueAsString(this);
+                return JsonUtils.defaultMapper().writeValueAsString(this);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -1,7 +1,6 @@
 package au.com.sensis.stubby;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,19 +9,19 @@ import org.apache.log4j.Logger;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import au.com.sensis.stubby.MatchResult.Field;
+import au.com.sensis.stubby.http.HttpRequest;
+import au.com.sensis.stubby.http.HttpResponse;
+import au.com.sensis.stubby.js.Script;
 
-public class StubbedResponse implements Serializable {
+public class StubExchange {
 
-    private static final long serialVersionUID = -1l;
+    private static final Logger LOGGER = Logger.getLogger(StubExchange.class);
 
-    private static final Logger LOGGER = Logger.getLogger(StubbedResponse.class);
-
-    private transient RequestPattern request = new RequestPattern();
+    private RequestPattern request = new RequestPattern();
     private HttpResponse response = new HttpResponse();
     private Long delay; // milliseconds
-    private String script; //JavaScript statement to execute
-    
-    private transient List<MatchResult> attempts = new ArrayList<MatchResult>();
+    private Script script;
+    private List<MatchResult> attempts = new ArrayList<MatchResult>();
 
     @JsonProperty
     public void setRequest(HttpRequest message) throws IOException {
@@ -65,11 +64,11 @@ public class StubbedResponse implements Serializable {
         this.delay = delay;
     }
 
-    public String getScript() {
+    public Script getScript() {
         return script;
     }
 
-    public void setScript(String script) {
+    public void setScript(Script script) {
         this.script = script;
     }
 
@@ -80,8 +79,8 @@ public class StubbedResponse implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof StubbedResponse)
-                && ((StubbedResponse)obj).request.equals(request);
+        return (obj instanceof StubExchange)
+                && ((StubExchange)obj).request.equals(request);
     }    
 
 }

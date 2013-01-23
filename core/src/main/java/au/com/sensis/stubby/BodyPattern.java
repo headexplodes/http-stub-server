@@ -1,5 +1,8 @@
 package au.com.sensis.stubby;
 
+import au.com.sensis.stubby.http.HttpMessage;
+
+// all instances should be imutable (so we can safely pass them to scripts etc.)
 public abstract class BodyPattern { // Note: using abstract class so we can force override of equals()
     
     public abstract boolean matches(HttpMessage request);

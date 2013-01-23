@@ -1,6 +1,5 @@
 package au.com.sensis.stubby;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,52 +7,44 @@ import java.util.regex.Pattern;
 
 import au.com.sensis.stubby.MatchResult.Field;
 import au.com.sensis.stubby.MatchResult.FieldType;
+import au.com.sensis.stubby.http.HttpMessage;
+import au.com.sensis.stubby.http.HttpParam;
+import au.com.sensis.stubby.http.HttpRequest;
 
 public class RequestPattern {
     
     public static final Pattern DEFAULT_PATTERN = Pattern.compile(".*");
     
-    private Pattern method = DEFAULT_PATTERN;
-    private Pattern path = DEFAULT_PATTERN;
-    private Set<ParamPattern> params = new HashSet<ParamPattern>();
-    private Set<ParamPattern> headers = new HashSet<ParamPattern>();
-    private BodyPattern body = new EmptyBodyPattern();
+    private Pattern method;
+    private Pattern path;
+    private Set<ParamPattern> params;
+    private Set<ParamPattern> headers;
+    private BodyPattern body;
 
     // TODO:
     // if body field is "body:jsonpath", use JsonPathBodyPattern
     // if body field is "body:xpath" [ ... ]
-      
-    public static RequestPattern fromMessage(HttpRequest message) throws IOException {
-        RequestPattern result = new RequestPattern();
-        if (message.getMethod() != null) {
-            result.method = Pattern.compile(message.getMethod());
+    
+    public RequestPattern() { 
+        this.method = DEFAULT_PATTERN;
+        this.path = DEFAULT_PATTERN;
+        this.params = new HashSet<ParamPattern>();
+        this.headers = new HashSet<ParamPattern>();
+        this.body = new EmptyBodyPattern();
+    }
+    
+    public RequestPattern(RequestPattern other) { // copy constructor
+        this.method = other.method;
+        this.path = other.path;
+        this.params = new HashSet<ParamPattern>();
+        for (ParamPattern param : other.params) {
+            this.params.add(new ParamPattern(param));
         }
-        if (message.getPath() != null) {
-            result.path = Pattern.compile(message.getPath());
+        this.headers = new HashSet<ParamPattern>();
+        for (ParamPattern header : other.headers) {
+            this.headers.add(new ParamPattern(header));
         }
-        if (message.getParams() != null) {
-            for (HttpParam param : message.getParams().values()) {
-                for (String value : param.getValues()) {
-                    result.params.add(new ParamPattern(param.getName(), Pattern.compile(value)));
-                }
-            }
-        }
-        if (message.getHeadersMap() != null) {
-            for (HttpHeader header : message.getHeadersMap().values()) {
-                for (String value : header.getValues()) {
-                    result.headers.add(new ParamPattern(header.getName(), Pattern.compile(value)));
-                }
-            }
-        }
-        if (message.getBody() != null) {
-            if (message.getBody() instanceof String) { // assume regular expression
-                result.body = new TextBodyPattern(message.getBody().toString());
-            } else { // simple JSON body pattern
-                result.body = new JsonBodyPattern(message.bodyAsJson());
-            }
-            // TODO: support JSONPath body as well...
-        }
-        return result;
+        this.body = other.body; // assume this is immutable
     }
 
     public MatchResult matches(HttpRequest message) throws URISyntaxException {
@@ -111,9 +102,8 @@ public class RequestPattern {
     }
     
     private Field matchHeader(HttpMessage message, ParamPattern pattern) {
-        String headerName = pattern.name.toLowerCase(); // headers are always lower-cased
-        Field field = new Field(FieldType.HEADER, headerName, pattern.pattern);
-        HttpHeader header = message.getHeadersMap().get(headerName); 
+        Field field = new Field(FieldType.HEADER, pattern.name, pattern.pattern);
+        HttpParam header = message.getHeadersMap().get(pattern.name); 
         if (header != null) {
             for (String value : header.getValues()) {
                 if (pattern.pattern.matcher(value).matches()) {
@@ -152,8 +142,24 @@ public class RequestPattern {
         return method;
     }
 
+    public void setMethod(Pattern method) {
+        this.method = method;
+    }
+
     public Pattern getPath() {
         return path;
+    }
+
+    public void setPath(Pattern path) {
+        this.path = path;
+    }
+
+    public BodyPattern getBody() {
+        return body;
+    }
+
+    public void setBody(BodyPattern body) {
+        this.body = body;
     }
 
     public Set<ParamPattern> getParams() {
@@ -164,9 +170,4 @@ public class RequestPattern {
         return headers;
     }
 
-    /*
-    public BodyPattern getBody() {
-        return body;
-    }
-    */
 }

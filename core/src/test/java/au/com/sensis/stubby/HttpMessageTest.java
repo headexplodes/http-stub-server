@@ -6,9 +6,13 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
+import au.com.sensis.stubby.http.HttpRequest;
+import au.com.sensis.stubby.http.HttpResponse;
+import au.com.sensis.stubby.utils.JsonUtils;
+
 public class HttpMessageTest {
 
-    private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = JsonUtils.defaultMapper();
     
     @Test
     public void testDeserialisePath() throws Exception {

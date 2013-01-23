@@ -1,65 +1,49 @@
 package au.com.sensis.stubby;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.SimpleScriptContext;
-
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 
+import au.com.sensis.stubby.http.HttpRequest;
+import au.com.sensis.stubby.http.HttpResponse;
+import au.com.sensis.stubby.js.ScriptWorld;
+import au.com.sensis.stubby.utils.JsonUtils;
 import au.com.sensis.stubby.utils.Pair;
 
 public class StubService {
 
     private static final Logger LOGGER = Logger.getLogger(StubService.class);
 
-    private LinkedList<StubbedResponse> responses = new LinkedList<StubbedResponse>();
+    private LinkedList<StubExchange> responses = new LinkedList<StubExchange>();
     private LinkedList<HttpRequest> requests = new LinkedList<HttpRequest>();
 
-    private ObjectMapper mapper() {
-        return new ObjectMapper();
-    }
-    
-    private String prettyPrint(Object value) {
-        try {
-            return mapper().writerWithDefaultPrettyPrinter().writeValueAsString(value); // TODO: add utility method for this...
-        } catch (IOException e) {
-            throw new RuntimeException("Error rendering JSON", e);
-        }
-    }
-
-    public synchronized void addResponse(StubbedResponse response) {
-        LOGGER.info("Adding response: " + prettyPrint(response));
-        responses.remove(response); // remove existing stubed request (ie, will never match anymore)
-        responses.addFirst(response); // ensure most recent match first   
-    }
-
-    public synchronized void addResponse(String responseJson) {
-        try {
-            addResponse(mapper().readValue(responseJson, StubbedResponse.class));
-        } catch (IOException e) {
-            throw new RuntimeException("Error parsing JSON", e);
-        }
+    public synchronized void addResponse(StubExchange exchange) {
+        LOGGER.debug("Adding response: " + JsonUtils.prettyPrint(exchange));
+        responses.remove(exchange); // remove existing stubed request (ie, will never match anymore)
+        responses.addFirst(exchange); // ensure most recent match first   
     }
 
     public synchronized Pair<HttpResponse,Long> findMatch(HttpRequest request) { // Pair<response, delay>
         try {
-            LOGGER.trace("Got request: " + prettyPrint(request));
+            LOGGER.trace("Got request: " + JsonUtils.prettyPrint(request));
             requests.addFirst(request);
-            for (StubbedResponse stubbedResponse : responses) {
+            for (StubExchange stubbedResponse : responses) {
                 if (stubbedResponse.matches(request)) {
                     LOGGER.info("Matched: " + request.getPath() + "");
 
-                    HttpResponse processedHttpResponse = applyScript(request, stubbedResponse);
-
-                    return new Pair<HttpResponse,Long>(
-                            processedHttpResponse,
-                            stubbedResponse.getDelay());
+                    if (stubbedResponse.getScript() != null) {
+                        ScriptWorld world = ScriptWorld.create(request, stubbedResponse); // creates deep copies of objects
+                        stubbedResponse.getScript().execute(world);
+                        return new Pair<HttpResponse,Long>(
+                                world.getResponse(),
+                                world.getDelay());
+                    } else {
+                        return new Pair<HttpResponse,Long>(
+                                stubbedResponse.getResponse(),
+                                stubbedResponse.getDelay());
+                    }
                 }
             }
             LOGGER.info("Didn't match: " + request.getPath());
@@ -69,28 +53,7 @@ public class StubService {
         }
     }
 
-    // TODO: move into a separate class (and add some unit tests to test objects can be accessed etc.)
-    private HttpResponse applyScript(HttpRequest request, StubbedResponse stubbedResponse) throws Exception {
-        if (stubbedResponse.getScript() == null) {
-            return stubbedResponse.getResponse();
-        }
-
-        HttpResponse processedResponse = stubbedResponse.getResponse().deepClone();
-
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("JavaScript");
-        engine.setContext(new SimpleScriptContext());
-
-        engine.put("request", request);
-        engine.put("response", processedResponse);
-
-        LOGGER.info("Executing script...");
-        engine.eval(stubbedResponse.getScript());
-
-        return processedResponse;
-    }
-
-    public synchronized StubbedResponse getResponse(int index) throws NotFoundException {
+    public synchronized StubExchange getResponse(int index) throws NotFoundException {
         try {
             return responses.get(index);
         } catch (NoSuchElementException e) {
@@ -98,7 +61,7 @@ public class StubService {
         }
     }
 
-    public synchronized List<StubbedResponse> getResponses() {
+    public synchronized List<StubExchange> getResponses() {
         return responses;
     }
 

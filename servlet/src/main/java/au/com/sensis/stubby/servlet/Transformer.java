@@ -11,12 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 
-import au.com.sensis.stubby.HttpHeader;
-import au.com.sensis.stubby.HttpParam;
-import au.com.sensis.stubby.HttpRequest;
-import au.com.sensis.stubby.HttpResponse;
+import au.com.sensis.stubby.http.HttpParam;
+import au.com.sensis.stubby.http.HttpParamSet;
+import au.com.sensis.stubby.http.HttpRequest;
+import au.com.sensis.stubby.http.HttpResponse;
+import au.com.sensis.stubby.utils.JsonUtils;
 
 /*
  * Transform between stubby & Servlet HTTP structures
@@ -24,14 +24,13 @@ import au.com.sensis.stubby.HttpResponse;
 public class Transformer {
 
     @SuppressWarnings("unchecked")
-    public static List<HttpHeader> fromServletHeaders(HttpServletRequest request) {
-        List<HttpHeader> result = new ArrayList<HttpHeader>();
+    public static HttpParamSet fromServletHeaders(HttpServletRequest request) {
+        HttpParamSet result = new HttpParamSet();
         Enumeration<String> headers = (Enumeration<String>)request.getHeaderNames();
         while (headers.hasMoreElements()) {
             String headerName = headers.nextElement();
             Enumeration<String> headerValues = (Enumeration<String>)request.getHeaders(headerName);
-            HttpHeader header = new HttpHeader();
-            header.setName(headerName.toLowerCase()); // all header names should be lower-cased
+            HttpParam header = new HttpParam(headerName.toLowerCase()); // all header names should be lower-cased
             while (headerValues.hasMoreElements()) {
                 header.getValues().add(headerValues.nextElement()); 
             }
@@ -91,7 +90,7 @@ public class Transformer {
         if (message.getBody() instanceof String) {
             IOUtils.write(message.getBody().toString(), response.getOutputStream());
         } else {
-            new ObjectMapper().writeValue(response.getOutputStream(), message.getBody()); // assume deserialised JSON (ie, a Map) 
+            new JsonUtils.defaultMapper().writeValue(response.getOutputStream(), message.getBody()); // assume deserialised JSON (ie, a Map) 
         }
     }
 
