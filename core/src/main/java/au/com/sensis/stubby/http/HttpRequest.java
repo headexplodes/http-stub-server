@@ -1,10 +1,6 @@
 package au.com.sensis.stubby.http;
 
 import java.util.List;
-import java.util.Map;
-
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 import au.com.sensis.stubby.FlatParam;
 
@@ -14,7 +10,7 @@ public class HttpRequest extends HttpMessage {
     private String path;
     private HttpParamSet params;
 
-    public HttpRequest() { // copy constructor
+    public HttpRequest() {
         this.params = new HttpParamSet(false); // case-sensitive map
     }
     
@@ -25,13 +21,11 @@ public class HttpRequest extends HttpMessage {
         this.params = new HttpParamSet(other.params);
     }
 
-    @JsonProperty
     public void setQueryParams(List<FlatParam> flattened) {
         params.addAll(flattened);
     }
 
-    @JsonProperty
-    public List<FlatParam> getQueryParams() {
+    public List<FlatParam> getParams() {
         return params.flatten();
     }
 
@@ -51,10 +45,10 @@ public class HttpRequest extends HttpMessage {
         this.path = path;
     }
 
-    @JsonIgnore
-    public Map<String, HttpParam> getParams() {
-        return params.getMap();
-    }
+//    @JsonIgnore
+//    public Map<String, HttpParam> getParams() {
+//        return params.getMap();
+//    }
 
     public void setParams(HttpParamSet params) {
         this.params = params;

@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import au.com.sensis.stubby.http.HttpMessage;
 import au.com.sensis.stubby.http.HttpRequest;
+import au.com.sensis.stubby.service.model.JsonBodyPattern;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 public class JsonBodyPatternTest {

@@ -1,11 +1,11 @@
-package au.com.sensis.stubby;
+package au.com.sensis.stubby.service.model;
 
-import au.com.sensis.stubby.http.HttpMessage;
+import au.com.sensis.stubby.model.StubMessage;
 
 public final class EmptyBodyPattern extends BodyPattern { 
     
     @Override
-    public boolean matches(HttpMessage request) {
+    public boolean matches(StubMessage request) {
         return true; // always passes
     }
     

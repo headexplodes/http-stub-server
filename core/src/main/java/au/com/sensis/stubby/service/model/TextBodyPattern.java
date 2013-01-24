@@ -1,8 +1,9 @@
-package au.com.sensis.stubby;
+package au.com.sensis.stubby.service.model;
 
 import java.util.regex.Pattern;
 
 import au.com.sensis.stubby.http.HttpMessage;
+import au.com.sensis.stubby.model.StubRequest;
 
 public class TextBodyPattern extends BodyPattern {
         
@@ -26,7 +27,7 @@ public class TextBodyPattern extends BodyPattern {
     }
     
     @Override
-    public boolean matches(HttpMessage request) {
+    public boolean matches(StubRequest request) {
         if (isText(request) && request.getBody() != null) { // require a body
             return pattern.matcher(request.getBody().toString()).matches(); // match pattern against entire body
         } else {

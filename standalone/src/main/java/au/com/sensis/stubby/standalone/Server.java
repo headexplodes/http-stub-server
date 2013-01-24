@@ -8,10 +8,10 @@ import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import au.com.sensis.stubby.NotFoundException;
-import au.com.sensis.stubby.StubService;
-import au.com.sensis.stubby.StubExchange;
 import au.com.sensis.stubby.http.HttpResponse;
+import au.com.sensis.stubby.service.NotFoundException;
+import au.com.sensis.stubby.service.StubService;
+import au.com.sensis.stubby.service.model.StubExchange;
 import au.com.sensis.stubby.utils.JsonUtils;
 import au.com.sensis.stubby.utils.Pair;
 

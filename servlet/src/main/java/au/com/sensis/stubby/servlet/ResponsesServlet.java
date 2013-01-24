@@ -6,7 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import au.com.sensis.stubby.StubExchange;
+import au.com.sensis.stubby.service.model.StubExchange;
 
 /*
  * Handles operations on response collection (eg, 'POST /_control/responses')

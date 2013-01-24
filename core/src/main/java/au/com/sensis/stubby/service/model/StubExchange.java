@@ -1,4 +1,4 @@
-package au.com.sensis.stubby;
+package au.com.sensis.stubby.service.model;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -8,10 +8,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import au.com.sensis.stubby.MatchResult.Field;
 import au.com.sensis.stubby.http.HttpRequest;
 import au.com.sensis.stubby.http.HttpResponse;
 import au.com.sensis.stubby.js.Script;
+import au.com.sensis.stubby.service.model.MatchResult.Field;
 
 public class StubExchange {
 
@@ -21,6 +21,7 @@ public class StubExchange {
     private HttpResponse response = new HttpResponse();
     private Long delay; // milliseconds
     private Script script;
+    
     private List<MatchResult> attempts = new ArrayList<MatchResult>();
 
     @JsonProperty

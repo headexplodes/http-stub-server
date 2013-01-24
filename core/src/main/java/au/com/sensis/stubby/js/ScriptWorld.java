@@ -1,8 +1,8 @@
 package au.com.sensis.stubby.js;
 
-import au.com.sensis.stubby.StubExchange;
 import au.com.sensis.stubby.http.HttpRequest;
 import au.com.sensis.stubby.http.HttpResponse;
+import au.com.sensis.stubby.service.model.StubExchange;
 
 public class ScriptWorld { // the world as JavaScript sees it
 

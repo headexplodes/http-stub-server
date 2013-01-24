@@ -1,6 +1,6 @@
 package au.com.sensis.stubby;
 
-public class FlatParam { // used for JSON de/serialisation
+public class FlatParam {
 
     private String name;
     private String value;

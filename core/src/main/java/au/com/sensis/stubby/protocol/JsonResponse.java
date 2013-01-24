@@ -2,14 +2,14 @@ package au.com.sensis.stubby.protocol;
 
 public class JsonResponse extends JsonMessage {
 
-    private Integer statusCode;
+    private Integer status;
 
-    public Integer getStatusCode() {
-        return statusCode;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setStatusCode(Integer statusCode) {
-        this.statusCode = statusCode;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
 }

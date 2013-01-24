@@ -1,4 +1,4 @@
-package au.com.sensis.stubby;
+package au.com.sensis.stubby.service;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import au.com.sensis.stubby.http.HttpRequest;
 import au.com.sensis.stubby.http.HttpResponse;
 import au.com.sensis.stubby.js.ScriptWorld;
+import au.com.sensis.stubby.service.model.StubExchange;
 import au.com.sensis.stubby.utils.JsonUtils;
 import au.com.sensis.stubby.utils.Pair;
 

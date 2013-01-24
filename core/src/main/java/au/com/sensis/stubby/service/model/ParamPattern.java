@@ -1,8 +1,8 @@
-package au.com.sensis.stubby;
+package au.com.sensis.stubby.service.model;
 
 import java.util.regex.Pattern;
 
-public class ParamPattern {
+public class ParamPattern { // TODO: need subclass for 'HeaderPattern'?
     
     private String name;
     private Pattern pattern;

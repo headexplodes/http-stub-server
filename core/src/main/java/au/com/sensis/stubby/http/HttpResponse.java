@@ -2,30 +2,30 @@ package au.com.sensis.stubby.http;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import au.com.sensis.stubby.utils.MessageUtils;
+import au.com.sensis.stubby.utils.HttpMessageUtils;
 
 public class HttpResponse extends HttpMessage {
 
-    private Integer statusCode;
+    private Integer status;
     
     public HttpResponse() { }
     
     public HttpResponse(HttpResponse other) {
         super(other);
-        this.statusCode = other.statusCode;
+        this.status = other.status;
     }
 
-    public Integer getStatusCode() {
-        return statusCode;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setStatusCode(Integer statusCode) {
-        this.statusCode = statusCode;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     @JsonIgnore
     public String getReasonPhrase() {
-        return MessageUtils.getReasonPhrase(statusCode);
+        return HttpMessageUtils.getReasonPhrase(status);
     }
 
 }

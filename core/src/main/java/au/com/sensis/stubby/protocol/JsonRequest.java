@@ -6,7 +6,7 @@ public class JsonRequest extends JsonMessage {
 
     private String method;
     private String path;
-    private List<JsonParam> queryParams;
+    private List<JsonParam> params;
 
     public String getMethod() {
         return method;
@@ -24,12 +24,12 @@ public class JsonRequest extends JsonMessage {
         this.path = path;
     }
 
-    public List<JsonParam> getQueryParams() {
-        return queryParams;
+    public List<JsonParam> getParams() {
+        return params;
     }
 
-    public void setQueryParams(List<JsonParam> queryParams) {
-        this.queryParams = queryParams;
+    public void setParams(List<JsonParam> params) {
+        this.params = params;
     }
 
 }

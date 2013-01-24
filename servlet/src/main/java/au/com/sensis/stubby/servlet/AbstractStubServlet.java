@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import au.com.sensis.stubby.StubService;
+import au.com.sensis.stubby.service.StubService;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 /*

@@ -1,11 +1,11 @@
-package au.com.sensis.stubby;
+package au.com.sensis.stubby.service.model;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import au.com.sensis.stubby.http.HttpMessage;
+import au.com.sensis.stubby.model.StubMessage;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 public class JsonBodyPattern extends BodyPattern {
@@ -48,7 +48,7 @@ public class JsonBodyPattern extends BodyPattern {
     
     // this method adheres to the 'BodyPattern' interface (but provides less useful information...)
     @Override
-    public boolean matches(HttpMessage request) {
+    public boolean matches(StubMessage request) {
         MatchResult result = matchResult(request);
         if (result.isMatch()) {
             return true;
@@ -63,7 +63,7 @@ public class JsonBodyPattern extends BodyPattern {
      * property in the request body. All fields in pattern are assumed to
      * be regular expressions. All strings are converted to strings for matching.
      */
-    public MatchResult matchResult(HttpMessage request) {
+    public MatchResult matchResult(StubMessage request) {
         if (request.isJson() && request.getBody() != null) { // assert that request _has_ a body
             return matchValue(pattern, request.bodyAsJson(), ""); // root could be any type (eg, an array)
         } else {

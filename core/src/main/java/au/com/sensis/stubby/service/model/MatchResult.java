@@ -1,4 +1,4 @@
-package au.com.sensis.stubby;
+package au.com.sensis.stubby.service.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
