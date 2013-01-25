@@ -17,9 +17,11 @@ public class StubRequest extends StubMessage {
         super(other);
         this.method = other.method;
         this.path = other.path;
-        this.params = new ArrayList<StubParam>();
-        for (StubParam param : other.params) {
-            params.add(new StubParam(param));
+        if (other.params != null) {
+            this.params = new ArrayList<StubParam>();
+            for (StubParam param : other.params) {
+                params.add(new StubParam(param));
+            }
         }
     }
     
@@ -46,13 +48,15 @@ public class StubRequest extends StubMessage {
     public void setParams(List<StubParam> params) {
         this.params = params;
     }
-       
+
     @JsonIgnore
     public List<String> getParams(String name) { // get all, case sensitive lookup
         List<String> result = new ArrayList<String>();
-        for (StubParam param : params) {
-            if (param.getName().equals(name)) {
-                result.add(param.getValue());
+        if (params != null) {
+            for (StubParam param : params) {
+                if (param.getName().equals(name)) {
+                    result.add(param.getValue());
+                }
             }
         }
         return result; // empty list if not found

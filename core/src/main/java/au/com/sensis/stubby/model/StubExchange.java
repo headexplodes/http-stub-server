@@ -10,8 +10,8 @@ public class StubExchange {
     public StubExchange() { }
     
     public StubExchange(StubExchange other) { // copy constructor
-        this.request = new StubRequest(other.request);
-        this.response = new StubResponse(other.response);
+        this.request = (other.request != null) ? new StubRequest(other.request) : null;
+        this.response = (other.response != null) ? new StubResponse(other.response) : null;
         this.delay = other.delay;
         this.script = other.script;
     }

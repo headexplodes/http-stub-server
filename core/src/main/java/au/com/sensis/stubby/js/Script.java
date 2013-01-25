@@ -24,7 +24,7 @@ public class Script {
         return engine;
     }
 
-    public void execute(ScriptWorld world) {
+    public Object execute(ScriptWorld world) {
         ScriptEngine engine = createEngine();
 
         engine.put("request", world.getRequest()); // TODO: deprecate (use 'exchange.request')
@@ -32,7 +32,7 @@ public class Script {
         engine.put("exchange", world);
 
         try {
-            engine.eval(source);
+            return engine.eval(source); // note: result is actually not used by stub server atm.
         } catch (ScriptException e) {
             throw new RuntimeException("Error executing script", e);
         }
