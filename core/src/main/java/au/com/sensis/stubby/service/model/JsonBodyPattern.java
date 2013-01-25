@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import au.com.sensis.stubby.model.StubMessage;
+import au.com.sensis.stubby.utils.HttpMessageUtils;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 public class JsonBodyPattern extends BodyPattern {
@@ -64,8 +65,8 @@ public class JsonBodyPattern extends BodyPattern {
      * be regular expressions. All strings are converted to strings for matching.
      */
     public MatchResult matchResult(StubMessage request) {
-        if (request.isJson() && request.getBody() != null) { // assert that request _has_ a body
-            return matchValue(pattern, request.bodyAsJson(), ""); // root could be any type (eg, an array)
+        if (HttpMessageUtils.isJson(request) && request.getBody() != null) { // assert that request _has_ a body
+            return matchValue(pattern, HttpMessageUtils.bodyAsJson(request), ""); // root could be any type (eg, an array)
         } else {
             return matchFailure("Expected content type: application/json", ".");
         }

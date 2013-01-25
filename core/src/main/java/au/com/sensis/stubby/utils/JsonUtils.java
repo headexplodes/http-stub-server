@@ -1,6 +1,8 @@
 package au.com.sensis.stubby.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -28,8 +30,40 @@ public class JsonUtils {
         try {
             return prettyWriter().writeValueAsString(value); 
         } catch (IOException e) {
-            throw new RuntimeException("Error rendering JSON", e);
+            throw new RuntimeException("Error serializing JSON", e);
         }
     }
 
+    public static String serialize(Object object) {
+        try {
+            return defaultMapper().writeValueAsString(object);
+        } catch (IOException e) {
+            throw new RuntimeException("Error serializing JSON", e);
+        }
+    }
+    
+    public static void serialize(OutputStream stream, Object object) {
+        try {
+            defaultMapper().writeValue(stream, object);
+        } catch (IOException e) {
+            throw new RuntimeException("Error serializing JSON", e);
+        }
+    }
+
+    public static <T> T deserialize(String json, Class<T> type) {
+        try {
+            return defaultMapper().readValue(json, type);
+        } catch (IOException e) {
+            throw new RuntimeException("Error deserializing JSON", e);
+        }
+    }
+    
+    public static <T> T deserialize(InputStream stream, Class<T> type) {
+        try {
+            return defaultMapper().readValue(stream, type);
+        } catch (IOException e) {
+            throw new RuntimeException("Error deserializing JSON", e);
+        }
+    }
+    
 }

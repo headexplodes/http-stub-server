@@ -7,9 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import au.com.sensis.stubby.http.HttpMessage;
-import au.com.sensis.stubby.http.HttpParam;
-import au.com.sensis.stubby.http.HttpRequest;
+import au.com.sensis.stubby.model.StubMessage;
 import au.com.sensis.stubby.model.StubParam;
 import au.com.sensis.stubby.model.StubRequest;
 import au.com.sensis.stubby.service.model.MatchResult.Field;
@@ -62,7 +60,7 @@ public class RequestPattern {
         }
     }
 
-    public MatchResult matches(HttpRequest message) throws URISyntaxException {
+    public MatchResult matches(StubRequest message) throws URISyntaxException {
         MatchResult result = new MatchResult();
 
         Field methodField = new Field(FieldType.METHOD, "method", method, message.getMethod());
@@ -101,31 +99,31 @@ public class RequestPattern {
         return result;
     }
 
-    private Field matchParam(HttpRequest message, ParamPattern pattern) {
-        Field field = new Field(FieldType.QUERY_PARAM, pattern.name, pattern.pattern);
-        HttpParam param = message.getParams().get(pattern.name);
-        if (param != null) {
-            for (String value : param.getValues()) {
-                if (pattern.pattern.matcher(value).matches()) {
+    private Field matchParam(StubRequest message, ParamPattern pattern) {
+        Field field = new Field(FieldType.QUERY_PARAM, pattern.getName(), pattern.getPattern());
+        List<String> values = message.getParams(pattern.getName());
+        if (!values.isEmpty()) {
+            for (String value : values) {
+                if (pattern.getPattern().matcher(value).matches()) {
                     return field.asMatch(value);
                 }
             }
-            return field.asMatchFailure(param.getValues().toString());
+            return field.asMatchFailure(values.toString());
         } else {
             return field.asNotFound();
         }
     }
 
-    private Field matchHeader(HttpMessage message, ParamPattern pattern) {
-        Field field = new Field(FieldType.HEADER, pattern.name, pattern.pattern);
-        HttpParam header = message.getHeadersMap().get(pattern.name);
-        if (header != null) {
-            for (String value : header.getValues()) {
-                if (pattern.pattern.matcher(value).matches()) {
+    private Field matchHeader(StubMessage message, ParamPattern pattern) {
+        Field field = new Field(FieldType.HEADER, pattern.getName(), pattern.getPattern());
+        List<String> values = message.getHeaders(pattern.getName()); // case insensitive lookup
+        if (!values.isEmpty()) {
+            for (String value : values) {
+                if (pattern.getPattern().matcher(value).matches()) {
                     return field.asMatch(value);
                 }
             }
-            return field.asMatchFailure(header.getValues().toString());
+            return field.asMatchFailure(values.toString());
         } else {
             return field.asNotFound();
         }

@@ -3,6 +3,8 @@ package au.com.sensis.stubby.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 public class StubRequest extends StubMessage {
 
     private String method;
@@ -43,6 +45,17 @@ public class StubRequest extends StubMessage {
 
     public void setParams(List<StubParam> params) {
         this.params = params;
+    }
+       
+    @JsonIgnore
+    public List<String> getParams(String name) { // get all, case sensitive lookup
+        List<String> result = new ArrayList<String>();
+        for (StubParam param : params) {
+            if (param.getName().equals(name)) {
+                result.add(param.getValue());
+            }
+        }
+        return result; // empty list if not found
     }
 
 }

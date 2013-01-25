@@ -3,6 +3,8 @@ package au.com.sensis.stubby.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import au.com.sensis.stubby.utils.DeepCopyUtils;
 
 public abstract class StubMessage {
@@ -23,15 +25,6 @@ public abstract class StubMessage {
     public List<StubParam> getHeaders() {
         return headers;
     }
-    
-    public StubParam getHeader(String name) { // get first, case insensitive lookup
-        for (StubParam header : headers) {
-            if (header.getName().equalsIgnoreCase(name)) {
-                return header;
-            }
-        }
-        return null; // not found
-    }
 
     public void setHeaders(List<StubParam> headers) {
         this.headers = headers;
@@ -44,5 +37,26 @@ public abstract class StubMessage {
     public void setBody(Object body) {
         this.body = body;
     }
-
+    
+    @JsonIgnore
+    public String getHeader(String name) { // get first, case insensitive lookup
+        for (StubParam header : headers) {
+            if (header.getName().equalsIgnoreCase(name)) {
+                return header.getValue();
+            }
+        }
+        return null; // not found
+    }
+    
+    @JsonIgnore
+    public List<String> getHeaders(String name) { // get all, case insensitive lookup
+        List<String> result = new ArrayList<String>();
+        for (StubParam header : headers) {
+            if (header.getName().equalsIgnoreCase(name)) {
+                result.add(header.getValue());
+            }
+        }
+        return result; // empty list if not found
+    }
+    
 }

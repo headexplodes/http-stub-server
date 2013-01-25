@@ -6,7 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import au.com.sensis.stubby.service.model.StubExchange;
+import au.com.sensis.stubby.service.model.StubServiceExchange;
 
 /*
  * Handles operations on response collection (eg, 'POST /_control/responses')
@@ -27,7 +27,7 @@ public class ResponsesServlet extends AbstractStubServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        StubExchange stubbedResponse = parseJsonBody(request, StubExchange.class);
+        StubServiceExchange stubbedResponse = parseJsonBody(request, StubServiceExchange.class);
         service().addResponse(stubbedResponse);
         returnOk(response);
     }

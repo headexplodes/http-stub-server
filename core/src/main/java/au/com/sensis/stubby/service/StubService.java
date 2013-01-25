@@ -6,55 +6,55 @@ import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
 
-import au.com.sensis.stubby.http.HttpRequest;
-import au.com.sensis.stubby.http.HttpResponse;
+import au.com.sensis.stubby.js.Script;
 import au.com.sensis.stubby.js.ScriptWorld;
-import au.com.sensis.stubby.service.model.StubExchange;
+import au.com.sensis.stubby.model.StubExchange;
+import au.com.sensis.stubby.model.StubRequest;
+import au.com.sensis.stubby.service.model.StubServiceExchange;
+import au.com.sensis.stubby.service.model.StubServiceResult;
 import au.com.sensis.stubby.utils.JsonUtils;
-import au.com.sensis.stubby.utils.Pair;
 
 public class StubService {
 
     private static final Logger LOGGER = Logger.getLogger(StubService.class);
 
-    private LinkedList<StubExchange> responses = new LinkedList<StubExchange>();
-    private LinkedList<HttpRequest> requests = new LinkedList<HttpRequest>();
+    private LinkedList<StubServiceExchange> responses = new LinkedList<StubServiceExchange>();
+    private LinkedList<StubRequest> requests = new LinkedList<StubRequest>();
 
     public synchronized void addResponse(StubExchange exchange) {
         LOGGER.debug("Adding response: " + JsonUtils.prettyPrint(exchange));
-        responses.remove(exchange); // remove existing stubed request (ie, will never match anymore)
-        responses.addFirst(exchange); // ensure most recent match first   
+        StubServiceExchange internal = new StubServiceExchange(exchange);
+        responses.remove(internal); // remove existing stubed request (ie, will never match anymore)
+        responses.addFirst(internal); // ensure most recent match first   
     }
 
-    public synchronized Pair<HttpResponse,Long> findMatch(HttpRequest request) { // Pair<response, delay>
+    public synchronized StubServiceResult findMatch(StubRequest request) {
         try {
             LOGGER.trace("Got request: " + JsonUtils.prettyPrint(request));
             requests.addFirst(request);
-            for (StubExchange stubbedResponse : responses) {
-                if (stubbedResponse.matches(request)) {
+            for (StubServiceExchange response : responses) {
+                if (response.matches(request)) {
                     LOGGER.info("Matched: " + request.getPath() + "");
-
-                    if (stubbedResponse.getScript() != null) {
-                        ScriptWorld world = ScriptWorld.create(request, stubbedResponse); // creates deep copies of objects
-                        stubbedResponse.getScript().execute(world);
-                        return new Pair<HttpResponse,Long>(
-                                world.getResponse(),
-                                world.getDelay());
+                    StubExchange exchange = response.getExchange();
+                    if (exchange.getScript() != null) {
+                        ScriptWorld world = new ScriptWorld(exchange); // creates deep copies of objects
+                        new Script(exchange.getScript()).execute(world);
+                        return new StubServiceResult(
+                                world.getResponse(), world.getDelay());
                     } else {
-                        return new Pair<HttpResponse,Long>(
-                                stubbedResponse.getResponse(),
-                                stubbedResponse.getDelay());
+                        return new StubServiceResult(
+                                exchange.getResponse(), exchange.getDelay());
                     }
                 }
             }
             LOGGER.info("Didn't match: " + request.getPath());
-            return null; // no match
+            return new StubServiceResult(); // no match
         } catch (Exception e) {
             throw new RuntimeException("Error matching request", e);
         }
     }
 
-    public synchronized StubExchange getResponse(int index) throws NotFoundException {
+    public synchronized StubServiceExchange getResponse(int index) throws NotFoundException {
         try {
             return responses.get(index);
         } catch (NoSuchElementException e) {
@@ -62,7 +62,7 @@ public class StubService {
         }
     }
 
-    public synchronized List<StubExchange> getResponses() {
+    public synchronized List<StubServiceExchange> getResponses() {
         return responses;
     }
 
@@ -80,7 +80,7 @@ public class StubService {
         responses.clear();
     }
 
-    public synchronized HttpRequest getRequest(int index) throws NotFoundException {
+    public synchronized StubRequest getRequest(int index) throws NotFoundException {
         try {
             return requests.get(index);
         } catch (NoSuchElementException e) {
@@ -88,7 +88,7 @@ public class StubService {
         }
     }
 
-    public synchronized List<HttpRequest> getRequests() {
+    public synchronized List<StubRequest> getRequests() {
         return requests;
     }
 

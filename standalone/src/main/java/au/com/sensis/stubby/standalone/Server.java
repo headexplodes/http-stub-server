@@ -11,7 +11,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import au.com.sensis.stubby.http.HttpResponse;
 import au.com.sensis.stubby.service.NotFoundException;
 import au.com.sensis.stubby.service.StubService;
-import au.com.sensis.stubby.service.model.StubExchange;
+import au.com.sensis.stubby.service.model.StubServiceExchange;
 import au.com.sensis.stubby.utils.JsonUtils;
 import au.com.sensis.stubby.utils.Pair;
 
@@ -137,7 +137,7 @@ public class Server implements HttpHandler {
     private void handleResponses(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         if (method.equals("POST")) {
-            StubExchange stubbedResponse = parseJsonBody(exchange, StubExchange.class);
+            StubServiceExchange stubbedResponse = parseJsonBody(exchange, StubServiceExchange.class);
             service.addResponse(stubbedResponse);
             returnOk(exchange);
         } else if (method.equals("DELETE")) {

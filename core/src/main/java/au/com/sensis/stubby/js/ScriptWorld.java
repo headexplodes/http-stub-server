@@ -1,46 +1,35 @@
 package au.com.sensis.stubby.js;
 
-import au.com.sensis.stubby.http.HttpRequest;
-import au.com.sensis.stubby.http.HttpResponse;
-import au.com.sensis.stubby.service.model.StubExchange;
+import au.com.sensis.stubby.model.StubExchange;
+import au.com.sensis.stubby.model.StubRequest;
+import au.com.sensis.stubby.model.StubResponse;
 
 public class ScriptWorld { // the world as JavaScript sees it
 
-    private HttpRequest request;
-    private HttpResponse response;
+    private StubRequest request;
+    private StubResponse response;
     private Long delay;
+    
+    public ScriptWorld(StubExchange exchange) { // copy everything so the script can't change the server state
+        this.request = new StubRequest(exchange.getRequest());
+        this.response = new StubResponse(exchange.getResponse());
+        this.delay = exchange.getDelay();
+    }
 
-    public HttpRequest getRequest() {
+    public StubRequest getRequest() {
         return request;
     }
 
-    public void setRequest(HttpRequest request) {
-        this.request = request;
-    }
-
-    public HttpResponse getResponse() {
+    public StubResponse getResponse() { // allow this to be changed for current request
         return response;
-    }
-
-    public void setResponse(HttpResponse response) {
-        this.response = response;
     }
 
     public Long getDelay() {
         return delay;
     }
 
-    public void setDelay(Long delay) {
+    public void setDelay(Long delay) {  // allow this to be changed for current request
         this.delay = delay;
-    }
-
-    // copy everything so script can't change server state
-    public static ScriptWorld create(HttpRequest request, StubExchange response) {
-        ScriptWorld result = new ScriptWorld();
-        result.setRequest(new HttpRequest(request));
-        result.setResponse(new HttpResponse(response.getResponse()));
-        result.setDelay(response.getDelay());
-        return result;
     }
     
 }
