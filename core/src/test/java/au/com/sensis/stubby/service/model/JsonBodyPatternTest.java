@@ -1,14 +1,13 @@
-package au.com.sensis.stubby;
+package au.com.sensis.stubby.service.model;
 
 import java.io.IOException;
 
+import org.apache.http.HttpMessage;
+import org.apache.http.HttpRequest;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
-import au.com.sensis.stubby.http.HttpMessage;
-import au.com.sensis.stubby.http.HttpRequest;
-import au.com.sensis.stubby.service.model.JsonBodyPattern;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 public class JsonBodyPatternTest {
