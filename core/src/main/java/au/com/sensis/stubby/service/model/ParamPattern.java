@@ -2,7 +2,7 @@ package au.com.sensis.stubby.service.model;
 
 import java.util.regex.Pattern;
 
-public class ParamPattern { // TODO: need subclass for 'HeaderPattern'?
+public class ParamPattern {
     
     private String name;
     private Pattern pattern;

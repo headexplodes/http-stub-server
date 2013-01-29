@@ -1,17 +1,17 @@
 package au.com.sensis.stubby.service.model;
 
-import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
 import au.com.sensis.stubby.model.StubMessage;
 import au.com.sensis.stubby.model.StubParam;
 import au.com.sensis.stubby.model.StubRequest;
-import au.com.sensis.stubby.service.model.MatchResult.Field;
-import au.com.sensis.stubby.service.model.MatchResult.FieldType;
+import au.com.sensis.stubby.service.model.MatchField.FieldType;
 
 public class RequestPattern {
 
@@ -32,7 +32,7 @@ public class RequestPattern {
     }
     
     private Pattern toPattern(String value) {
-        return (value != null) ? DEFAULT_PATTERN : Pattern.compile(value);
+        return (value != null) ? Pattern.compile(value) : DEFAULT_PATTERN;
     }
     
     private Set<ParamPattern> toPattern(List<StubParam> params) {
@@ -60,10 +60,10 @@ public class RequestPattern {
         }
     }
 
-    public MatchResult matches(StubRequest message) throws URISyntaxException {
+    public MatchResult matches(StubRequest message) {
         MatchResult result = new MatchResult();
 
-        Field methodField = new Field(FieldType.METHOD, "method", method, message.getMethod());
+        MatchField methodField = new MatchField(MatchField.FieldType.METHOD, "method", method, message.getMethod());
         if (method != null) {
             if (method.matcher(message.getMethod()).matches()) {
                 result.add(methodField.asMatch(message.getMethod()));
@@ -72,7 +72,7 @@ public class RequestPattern {
             }
         }
 
-        Field pathField = new Field(FieldType.PATH, "path", path, message.getPath());
+        MatchField pathField = new MatchField(FieldType.PATH, "path", path, message.getPath());
         if (path.matcher(message.getPath()).matches()) {
             result.add(pathField.asMatch(message.getPath()));
         } else {
@@ -88,7 +88,7 @@ public class RequestPattern {
         }
 
         if (body != null) {
-            Field bodyField = new Field(FieldType.BODY, "body", body.expectedValue());
+            MatchField bodyField = new MatchField(FieldType.BODY, "body", body.expectedValue());
             if (body.matches(message)) {
                 result.add(bodyField.asMatch(message.getBody()));
             } else {
@@ -99,8 +99,8 @@ public class RequestPattern {
         return result;
     }
 
-    private Field matchParam(StubRequest message, ParamPattern pattern) {
-        Field field = new Field(FieldType.QUERY_PARAM, pattern.getName(), pattern.getPattern());
+    private MatchField matchParam(StubRequest message, ParamPattern pattern) {
+        MatchField field = new MatchField(FieldType.QUERY_PARAM, pattern.getName(), pattern.getPattern());
         List<String> values = message.getParams(pattern.getName());
         if (!values.isEmpty()) {
             for (String value : values) {
@@ -114,8 +114,8 @@ public class RequestPattern {
         }
     }
 
-    private Field matchHeader(StubMessage message, ParamPattern pattern) {
-        Field field = new Field(FieldType.HEADER, pattern.getName(), pattern.getPattern());
+    private MatchField matchHeader(StubMessage message, ParamPattern pattern) {
+        MatchField field = new MatchField(FieldType.HEADER, pattern.getName(), pattern.getPattern());
         List<String> values = message.getHeaders(pattern.getName()); // case insensitive lookup
         if (!values.isEmpty()) {
             for (String value : values) {
@@ -133,22 +133,27 @@ public class RequestPattern {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((method == null) ? 0 : method.pattern().hashCode());
+        result = prime * result + ((path == null) ? 0 : path.pattern().hashCode());
         result = prime * result + ((body == null) ? 0 : body.hashCode());
         result = prime * result + ((headers == null) ? 0 : headers.hashCode());
-        result = prime * result + ((method == null) ? 0 : method.hashCode());
         result = prime * result + ((params == null) ? 0 : params.hashCode());
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof ParamPattern)
+        return (obj instanceof RequestPattern)
                 && ((RequestPattern) obj).method.pattern().equals(method.pattern())
                 && ((RequestPattern) obj).path.pattern().equals(path.pattern())
                 && ((RequestPattern) obj).params.equals(params)
                 && ((RequestPattern) obj).headers.equals(headers)
                 && ((RequestPattern) obj).body.equals(body);
+    }
+    
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
     public Pattern getMethod() {

@@ -1,31 +1,22 @@
 package au.com.sensis.stubby.service.model;
 
-import java.io.IOException;
-
-import org.apache.http.HttpMessage;
-import org.apache.http.HttpRequest;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
+import au.com.sensis.stubby.model.StubMessage;
+import au.com.sensis.stubby.model.StubRequest;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 public class JsonBodyPatternTest {
-    
-    private ObjectMapper mapper = JsonUtils.defaultMapper();
-    
+
     private Object parse(String json) {
-        try {
-            return mapper.readValue(json, Object.class);
-        } catch (IOException e) {
-            throw new RuntimeException("Error parsing JSON", e);
-        }
+        return JsonUtils.deserialize(json, Object.class);
     }
 
-    private HttpRequest message(String bodyJson) {
-        HttpRequest message = new HttpRequest();
+    private StubMessage message(String bodyJson) {
+        StubRequest message = new StubRequest();
         message.setBody(parse(bodyJson));
-        message.setContentType("application/json");
+        message.setHeader("Content-Type", "application/json");
         return message;
     }
     
@@ -57,8 +48,8 @@ public class JsonBodyPatternTest {
     
     @Test
     public void testInvalidContentType() throws Exception {
-        HttpMessage request = message("{}");
-        request.setContentType("text/plain");
+        StubMessage request = message("{}");
+        request.setHeader("Content-Type", "text/plain");
         Assert.assertFalse(pattern("{}").matches(request));
     }
     

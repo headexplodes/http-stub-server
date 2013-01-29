@@ -1,0 +1,144 @@
+package au.com.sensis.stubby.service.model;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import au.com.sensis.stubby.model.StubParam;
+import au.com.sensis.stubby.model.StubRequest;
+
+public class RequestPatternTest {
+
+    private StubRequest stubbedRequest; 
+    private StubRequest incomingRequest;
+    
+    private RequestPattern instance1;
+    private RequestPattern instance2;
+        
+    @Before
+    public void before() {
+        stubbedRequest = new StubRequest();
+        stubbedRequest.setMethod("PO.*");
+        stubbedRequest.setPath("/request/.*");
+        stubbedRequest.setParams(Arrays.asList(new StubParam("foo", "b.r")));
+        stubbedRequest.setHeaders(Arrays.asList(new StubParam("Content-Type", "text/plain; .+")));
+        stubbedRequest.setBody("body .*");        
+        
+        incomingRequest = new StubRequest();
+        incomingRequest.setMethod("POST");
+        incomingRequest.setPath("/request/path");
+        incomingRequest.setParams(Arrays.asList(new StubParam("foo", "bar")));
+        incomingRequest.setHeaders(Arrays.asList(new StubParam("Content-Type", "text/plain; charset=UTF-8")));
+        incomingRequest.setBody("body pattern");        
+        
+        instance1 = new RequestPattern(stubbedRequest);
+        instance2 = new RequestPattern(stubbedRequest);
+    }
+        
+    private void assertMatchFailure(MatchResult result, MatchField.FieldType type, String name, String expected, String actual) {
+        MatchField expectedField = new MatchField(type, name, expected, actual);
+        
+        assertFalse(result.matches());
+        assertThat(result.getFields(), hasItem(expected));
+    }
+
+    @Test
+    public void testEquality() {
+        assertEquals(instance1, instance2);
+    }
+
+    @Test
+    public void testHashCode() {
+        assertEquals(instance1.hashCode(), instance2.hashCode());
+    }
+    
+    @Test
+    public void testFromPattern() {
+        assertEquals("PO.*", instance1.getMethod().pattern());
+        assertEquals("/path/.*", instance1.getPath().pattern());
+        
+        assertEquals(1, instance1.getParams().size());
+        assertEquals("foo", instance1.getParams().iterator().next().getName());
+        assertEquals("b.r", instance1.getParams().iterator().next().getPattern().pattern());
+        
+        assertEquals(1, instance1.getParams().size());
+        assertEquals("Content-Type", instance1.getHeaders().iterator().next().getName());
+        assertEquals("text/plain; .+", instance1.getHeaders().iterator().next().getPattern().pattern());
+        
+        assertEquals(new TextBodyPattern("body .*"), instance1.getBody());
+    }
+    
+    @Test
+    public void testFromEmptyPattern() {
+        instance1 = new RequestPattern(new StubRequest());
+        
+        assertEquals(".*", instance1.getMethod().pattern());
+        assertEquals(".*", instance1.getPath().pattern());
+        assertEquals(new EmptyBodyPattern(), instance1.getBody());
+    }
+    
+    @Test
+    public void testJsonBodyPatternObject() {
+        Map<String,String> pattern = new HashMap<String,String>();
+        pattern.put("foo", "bar");
+        stubbedRequest.setBody(pattern);
+        
+        instance1 = new RequestPattern(stubbedRequest);
+        
+        assertEquals(new JsonBodyPattern(pattern), instance1.getBody());
+    }
+    
+    @Test
+    public void testJsonBodyPatternList() {
+        List<String> pattern = Arrays.asList("foo", "bar");
+        stubbedRequest.setBody(pattern);
+        
+        instance1 = new RequestPattern(stubbedRequest);
+        
+        assertEquals(new JsonBodyPattern(pattern), instance1.getBody());
+    }
+    
+    @Test
+    public void testMatches() {
+        MatchResult result = instance1.matches(incomingRequest);
+        
+        assertTrue(result.matches());
+    }
+    
+    @Test
+    public void testMatchesExtraParams() {
+        incomingRequest.setParams(Arrays.asList(
+                new StubParam("foo", "bar"),
+                new StubParam("foo", "asdfasdf")));
+        
+        MatchResult result = instance1.matches(incomingRequest);
+        
+        assertTrue(result.matches());
+    }
+    
+    @Test
+    public void testNoMatchWrongParams() {
+        incomingRequest.setParams(Arrays.asList(new StubParam("foo", "asdf")));
+        
+        MatchResult result = instance1.matches(incomingRequest);
+        
+        assertMatchFailure(result, MatchField.FieldType.QUERY_PARAM, "foo", "b.r", "asdf");
+    }
+    
+    @Test
+    public void testMatchesExtraHeaders() {
+        incomingRequest.setHeaders(Arrays.asList(
+                new StubParam("Content-Type", "text/plain; .+"),
+                new StubParam("Content-Type", "application/json")));
+        
+        MatchResult result = instance1.matches(incomingRequest);
+        
+        assertTrue(result.matches());
+    }
+    
+    
+}

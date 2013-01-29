@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import au.com.sensis.stubby.model.StubExchange;
 import au.com.sensis.stubby.model.StubRequest;
-import au.com.sensis.stubby.service.model.MatchResult.Field;
 
 public class StubServiceExchange { // wrap exchange model with some extra runtime info
 
@@ -26,7 +25,7 @@ public class StubServiceExchange { // wrap exchange model with some extra runtim
     
     public boolean matches(StubRequest message) throws URISyntaxException {
         MatchResult result = requestPattern.matches(message);
-        for (Field field : result.fields) {
+        for (MatchField field : result.getFields()) {
             LOGGER.trace("Match outcome: " + field);
         }
         LOGGER.trace("Match score: " + result.score());
@@ -42,6 +41,11 @@ public class StubServiceExchange { // wrap exchange model with some extra runtim
 
     public List<MatchResult> getAttempts() {
         return attempts;
+    }
+    
+    @Override
+    public String toString() {
+        return requestPattern.toString();
     }
 
     @Override
