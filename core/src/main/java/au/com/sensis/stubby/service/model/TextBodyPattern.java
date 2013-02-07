@@ -15,7 +15,7 @@ public class TextBodyPattern extends BodyPattern {
     
     @Override
     public String expectedValue() {
-        return "m/" + pattern.pattern() + "/";
+        return pattern.pattern();
     }
     
     @Override

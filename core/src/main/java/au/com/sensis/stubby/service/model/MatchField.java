@@ -1,5 +1,7 @@
 package au.com.sensis.stubby.service.model;
 
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 
 import au.com.sensis.stubby.utils.JsonUtils;
@@ -13,13 +15,13 @@ public class MatchField {
         HEADER,
         BODY;
     }
-    
+
     public enum MatchType {
         NOT_FOUND,
         MATCH_FAILURE,
         MATCH;
     }
-    
+
     private FieldType fieldType;
     private String fieldName;
     private MatchType matchType;
@@ -30,13 +32,6 @@ public class MatchField {
         this.fieldType = fieldType;
         this.fieldName = fieldName;
         this.expectedValue = expectedValue;
-    }
-
-    public MatchField(FieldType fieldType, String fieldName, Object expectedValue, Object actualValue) {
-        this.fieldType = fieldType;
-        this.fieldName = fieldName;
-        this.expectedValue = expectedValue;
-        this.actualValue = actualValue;
     }
 
     public MatchField asMatch(Object actualValue) {
@@ -88,10 +83,35 @@ public class MatchField {
     public String toString() {
         return JsonUtils.serialize(this);
     }
-    
+
     @Override
-    public boolean equals(Object other) { // only used in tests
-        return EqualsBuilder.reflectionEquals(other, this);
+    public boolean equals(Object object) { // only used in tests
+        if (object instanceof MatchField) {
+            MatchField other = (MatchField) object;
+            if (!fieldName.equals(other.fieldName)
+                    || !fieldType.equals(other.fieldType)
+                    || !matchType.equals(other.matchType)) {
+                return false;
+            }
+            if (!safeEquals(normalise(expectedValue), normalise(other.expectedValue))) {
+                return false;
+            }
+            return EqualsBuilder.reflectionEquals(actualValue, other.actualValue);
+        } else {
+            return false;
+        }
+    }
+    
+    private boolean safeEquals(Object a, Object b) {
+        return (a == null && b == null) || (a != null && a.equals(b));
+    }
+    
+    private Object normalise(Object value) {
+        if (value != null && value instanceof Pattern) {
+            return ((Pattern)value).pattern(); // compare regex string not 'Pattern' object
+        } else {
+            return value;
+        }
     }
 
     public FieldType getFieldType() {

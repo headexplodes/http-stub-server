@@ -1,5 +1,11 @@
 package au.com.sensis.stubby.service.model;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,10 +46,17 @@ public class RequestPatternTest {
     }
         
     private void assertMatchFailure(MatchResult result, MatchField.FieldType type, String name, String expected, String actual) {
-        MatchField expectedField = new MatchField(type, name, expected, actual);
+        MatchField expectedField = new MatchField(type, name, expected).asMatchFailure(actual);
         
         assertFalse(result.matches());
-        assertThat(result.getFields(), hasItem(expected));
+        assertThat(result.getFields(), hasItem(expectedField));
+    }
+    
+    private void assertMatchSuccess(MatchResult result, MatchField.FieldType type, String name, String expected, String actual) {
+        MatchField expectedField = new MatchField(type, name, expected).asMatchFailure(actual);
+        
+        assertTrue(result.matches());
+        assertThat(result.getFields(), hasItem(expectedField));
     }
 
     @Test
@@ -59,7 +72,7 @@ public class RequestPatternTest {
     @Test
     public void testFromPattern() {
         assertEquals("PO.*", instance1.getMethod().pattern());
-        assertEquals("/path/.*", instance1.getPath().pattern());
+        assertEquals("/request/.*", instance1.getPath().pattern());
         
         assertEquals(1, instance1.getParams().size());
         assertEquals("foo", instance1.getParams().iterator().next().getName());
@@ -107,6 +120,10 @@ public class RequestPatternTest {
         MatchResult result = instance1.matches(incomingRequest);
         
         assertTrue(result.matches());
+        
+        assertMatchFailure(result, MatchField.FieldType.BODY, "body", "body .*", null);
+        
+        TODO: assert each field was in success
     }
     
     @Test
@@ -140,5 +157,42 @@ public class RequestPatternTest {
         assertTrue(result.matches());
     }
     
+    @Test
+    public void testNoMatchWrongHeaders() {
+        incomingRequest.setHeaders(Arrays.asList(new StubParam("Content-Type", "image/gif")));
+        
+        MatchResult result = instance1.matches(incomingRequest);
+        
+        assertMatchFailure(result, MatchField.FieldType.HEADER, "Content-Type", "text/plain; .+", "image/gif");
+    }
+    
+    @Test
+    public void testNoMatchWrongBody() {
+        incomingRequest.setBody("wrong body");
+        
+        MatchResult result = instance1.matches(incomingRequest);
+        
+        assertMatchFailure(result, MatchField.FieldType.BODY, "body", "body .*", "wrong body");
+    }
+    
+    @Test
+    public void testNoMatchNoBody() {
+        incomingRequest.setBody(null); // no body
+        
+        MatchResult result = instance1.matches(incomingRequest);
+        
+        assertMatchFailure(result, MatchField.FieldType.BODY, "body", "body .*", null);
+    }
+    
+    @Test
+    public void testNoMatchWrongMethod() {
+        incomingRequest.setMethod("HEAD");
+        
+        MatchResult result = instance1.matches(incomingRequest);
+        
+        assertMatchFailure(result, MatchField.FieldType.METHOD, "method", "PO.*", "HEAD");
+    }
+    
+    // TODO: assert each field not found
     
 }

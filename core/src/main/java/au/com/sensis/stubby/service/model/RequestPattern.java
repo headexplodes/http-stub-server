@@ -63,7 +63,7 @@ public class RequestPattern {
     public MatchResult matches(StubRequest message) {
         MatchResult result = new MatchResult();
 
-        MatchField methodField = new MatchField(MatchField.FieldType.METHOD, "method", method, message.getMethod());
+        MatchField methodField = new MatchField(MatchField.FieldType.METHOD, "method", method);
         if (method != null) {
             if (method.matcher(message.getMethod()).matches()) {
                 result.add(methodField.asMatch(message.getMethod()));
@@ -72,7 +72,7 @@ public class RequestPattern {
             }
         }
 
-        MatchField pathField = new MatchField(FieldType.PATH, "path", path, message.getPath());
+        MatchField pathField = new MatchField(FieldType.PATH, "path", path);
         if (path.matcher(message.getPath()).matches()) {
             result.add(pathField.asMatch(message.getPath()));
         } else {
@@ -108,7 +108,7 @@ public class RequestPattern {
                     return field.asMatch(value);
                 }
             }
-            return field.asMatchFailure(values.toString());
+            return field.asMatchFailure(values.size() > 1 ? values : values.get(0)); // don't wrap in array if only single value
         } else {
             return field.asNotFound();
         }
@@ -123,7 +123,7 @@ public class RequestPattern {
                     return field.asMatch(value);
                 }
             }
-            return field.asMatchFailure(values.toString());
+            return field.asMatchFailure(values.size() > 1 ? values : values.get(0)); // don't wrap in array if only single value
         } else {
             return field.asNotFound();
         }
