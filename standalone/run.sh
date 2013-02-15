@@ -7,11 +7,11 @@
 HTTP_PORT=9001
 HTTPS_PORT=9443
 
-if [ $1 != "" ]; then
+if [ "$1" != "" ]; then
    HTTP_PORT=$1
 fi
 
-if [ $2 != "" ]; then
+if [ "$2" != "" ]; then
    HTTPS_PORT=$2
 fi
 

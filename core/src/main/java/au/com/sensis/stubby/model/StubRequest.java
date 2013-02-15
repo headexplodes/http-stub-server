@@ -48,6 +48,18 @@ public class StubRequest extends StubMessage {
     public void setParams(List<StubParam> params) {
         this.params = params;
     }
+    
+    @JsonIgnore
+    public String getParam(String name) { // get first, case sensitive lookup
+        if (params != null) {
+            for (StubParam param : params) {
+                if (param.getName().equals(name)) {
+                    return param.getValue();
+                }
+            }
+        }
+        return null; // not found
+    }
 
     @JsonIgnore
     public List<String> getParams(String name) { // get all, case sensitive lookup

@@ -1,14 +1,10 @@
 {
     "request": {
-        "path": "/script/bar",
-        "params" : [ {
-            "name" : "query",
-            "pattern" : "12090544"
-        }]
+        "path": "/script/bar"
     },
     "response": {
-        "statusCode": 500,
+        "status": 500,
         "body": "Sup?"
     },
-    "script" : "if (request.params.get('run').value() == 'true') {response.statusCode = 200; response.body = request.params.get('run').value()}"
+    "script" : "if (request.getParam('run') == 'true') { response.statusCode = 200; response.body = request.getParam('run'); }"
 }

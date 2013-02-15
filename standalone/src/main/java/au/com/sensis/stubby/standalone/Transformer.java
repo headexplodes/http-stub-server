@@ -58,8 +58,10 @@ public class Transformer {
     }
 
     public static void populateExchange(StubResponse message, HttpExchange exchange) throws IOException {
-        for (StubParam header : message.getHeaders()) {
-            exchange.getResponseHeaders().add(header.getName(), header.getValue());
+        if (message.getHeaders() != null) {
+            for (StubParam header : message.getHeaders()) {
+                exchange.getResponseHeaders().add(header.getName(), header.getValue());
+            }
         }
         exchange.sendResponseHeaders(message.getStatus(), 0); // arbitrary-length body
         if (message.getBody() instanceof String) {

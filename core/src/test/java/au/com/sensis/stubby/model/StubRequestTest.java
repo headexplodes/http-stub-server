@@ -1,6 +1,7 @@
 package au.com.sensis.stubby.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
@@ -60,6 +61,16 @@ public class StubRequestTest {
     @Test
     public void getGetParamsNotFound() {
         assertEquals(Arrays.asList(), request.getParams("FOO")); // ensure case-sensitive
+    }
+    
+    @Test
+    public void testGetParamFound() {
+        assertEquals("bar1", request.getParam("foo"));
+    }
+    
+    @Test
+    public void getGetParamNotFound() {
+        assertNull(request.getParam("FOO")); // ensure case-sensitive
     }
     
     @Test

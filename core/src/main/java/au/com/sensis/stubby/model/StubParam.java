@@ -4,6 +4,8 @@ public class StubParam {
 
     private String name;
     private String value;
+    
+    public StubParam() { }
 
     public StubParam(String name, String value) {
         this.name = name;
