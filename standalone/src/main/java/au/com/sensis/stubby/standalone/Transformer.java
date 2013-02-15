@@ -1,6 +1,7 @@
 package au.com.sensis.stubby.standalone;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,10 +9,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 
-import au.com.sensis.stubby.http.HttpParam;
-import au.com.sensis.stubby.http.HttpParamSet;
-import au.com.sensis.stubby.http.HttpRequest;
-import au.com.sensis.stubby.http.HttpResponse;
+import au.com.sensis.stubby.model.StubParam;
+import au.com.sensis.stubby.model.StubRequest;
+import au.com.sensis.stubby.model.StubResponse;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -21,25 +21,27 @@ import com.sun.net.httpserver.HttpExchange;
  */
 public class Transformer {
 
-    public static HttpParamSet fromExchangeHeaders(HttpExchange exchange) {
-        HttpParamSet result = new HttpParamSet();
+    public static List<StubParam> fromExchangeHeaders(HttpExchange exchange) {
+        List<StubParam> result = new ArrayList<StubParam>();
         for (Map.Entry<String, List<String>> entry : exchange.getRequestHeaders().entrySet()) {
-            result.add(entry.getKey().toLowerCase(), entry.getValue()); // all header names should be lower-cased
+            for (String value : entry.getValue()) {
+                result.add(new StubParam(entry.getKey(), value));
+            }
         }
         return result;
     }
 
-    public static HttpParamSet fromExchangeParams(HttpExchange exchange) {
+    public static List<StubParam> fromExchangeParams(HttpExchange exchange) {
         List<NameValuePair> params = URLEncodedUtils.parse(exchange.getRequestURI(), "UTF-8");
-        HttpParamSet result = new HttpParamSet();
+        List<StubParam> result = new ArrayList<StubParam>();
         for (NameValuePair pair : params) {
-            result.add(pair.getName(), pair.getValue());
+            result.add(new StubParam(pair.getName(), pair.getValue()));
         }
         return result;
     }
 
-    public static HttpRequest fromExchange(HttpExchange exchange) {
-        HttpRequest result = new HttpRequest();
+    public static StubRequest fromExchange(HttpExchange exchange) {
+        StubRequest result = new StubRequest();
         result.setPath(exchange.getRequestURI().getPath());
         String method = exchange.getRequestMethod().toUpperCase(); // method should always be upper-case
         result.setMethod(method);
@@ -55,17 +57,15 @@ public class Transformer {
         return result;
     }
 
-    public static void populateExchange(HttpResponse message, HttpExchange exchange) throws IOException {
-        for (HttpParam header : message.getHeadersMap().values()) {
-            for (String value : header.getValues()) {
-                exchange.getResponseHeaders().add(header.getName(), value);
-            }
+    public static void populateExchange(StubResponse message, HttpExchange exchange) throws IOException {
+        for (StubParam header : message.getHeaders()) {
+            exchange.getResponseHeaders().add(header.getName(), header.getValue());
         }
-        exchange.sendResponseHeaders(message.getStatusCode(), 0); // arbirary-length body
+        exchange.sendResponseHeaders(message.getStatus(), 0); // arbitrary-length body
         if (message.getBody() instanceof String) {
             IOUtils.write(message.getBody().toString(), exchange.getResponseBody());
         } else {
-            new JsonUtils.defaultMapper().writeValue(exchange.getResponseBody(), message.getBody()); // assume deserialised JSON (ie, a Map) 
+            JsonUtils.serialize(exchange.getResponseBody(), message.getBody()); // assume deserialised JSON (ie, a Map) 
         }
         exchange.getResponseBody().close();
     }

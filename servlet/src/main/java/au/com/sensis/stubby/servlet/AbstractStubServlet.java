@@ -1,7 +1,6 @@
 package au.com.sensis.stubby.servlet;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 
@@ -12,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpStatus;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import au.com.sensis.stubby.service.JsonServiceInterface;
 import au.com.sensis.stubby.service.StubService;
 import au.com.sensis.stubby.utils.JsonUtils;
 
@@ -32,6 +32,10 @@ public abstract class AbstractStubServlet extends HttpServlet {
         } else {
             throw new IllegalStateException("Service not created"); // ensure StubContextListener was invoked first
         }
+    }
+    
+    protected JsonServiceInterface jsonService() {
+        return new JsonServiceInterface(service());
     }
     
     protected void returnOk(HttpServletResponse response) throws IOException {
@@ -75,18 +79,18 @@ public abstract class AbstractStubServlet extends HttpServlet {
         return Integer.parseInt(pathInfo);
     }
     
-    protected <T> T parseJsonBody(HttpServletRequest request, Class<T> bodyClass) throws IOException {
-        String contentType = request.getHeader("Content-Type");
-        if (contentType != null && contentType.startsWith("application/json")) {
-            InputStream stream = request.getInputStream();
-            try {
-                return mapper.readValue(stream, bodyClass);
-            } finally {
-                stream.close();
-            }
-        } else {
-            throw new RuntimeException("Unexpected content type");
-        }
-    }
+//    protected <T> T parseJsonBody(HttpServletRequest request, Class<T> bodyClass) throws IOException {
+//        String contentType = request.getHeader("Content-Type");
+//        if (contentType != null && contentType.startsWith("application/json")) {
+//            InputStream stream = request.getInputStream();
+//            try {
+//                return mapper.readValue(stream, bodyClass);
+//            } finally {
+//                stream.close();
+//            }
+//        } else {
+//            throw new RuntimeException("Unexpected content type");
+//        }
+//    }
 
 }
