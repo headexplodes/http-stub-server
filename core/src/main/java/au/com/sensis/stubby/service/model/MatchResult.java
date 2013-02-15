@@ -40,5 +40,10 @@ public class MatchResult implements Comparable<MatchResult> {
     public int compareTo(MatchResult other) {
         return new Integer(score()).compareTo(other.score()) * -1; // highest score first
     }
+    
+    @Override
+    public String toString() {
+        return fields.toString();
+    }
 
 }

@@ -3,23 +3,22 @@ package au.com.sensis.stubby.service.model;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import au.com.sensis.stubby.model.StubMessage;
+import au.com.sensis.stubby.service.model.MatchField.FieldType;
 import au.com.sensis.stubby.utils.HttpMessageUtils;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 public class JsonBodyPattern extends BodyPattern {
     
-    private static final Logger LOGGER = Logger.getLogger(JsonBodyPattern.class);
-    
-    public static class MatchResult {
+    public static class MatchResult { // internal match result type
         
         private boolean match;
+        private String path;
         private String reason;
         
-        public MatchResult(boolean match, String reason) {
+        public MatchResult(boolean match, String path, String reason) {
             this.match = match;
+            this.path = path;
             this.reason = reason;
         }
 
@@ -27,9 +26,18 @@ public class JsonBodyPattern extends BodyPattern {
             return match;
         }
 
+        public String getPath() {
+            return path;
+        }
+        
         public String getReason() {
             return reason;
         }        
+        
+        public String message() {
+            return String.format("%s (at '%s')", reason, path);
+        }
+        
     }
 
     private Object pattern;
@@ -43,19 +51,15 @@ public class JsonBodyPattern extends BodyPattern {
     }
     
     @Override
-    public String expectedValue() {
-        return JsonUtils.prettyPrint(pattern); // write pretty
-    }
-    
-    // this method adheres to the 'BodyPattern' interface (but provides less useful information...)
-    @Override
-    public boolean matches(StubMessage request) {
+    public MatchField matches(StubMessage request) {
+        String expected = JsonUtils.prettyPrint(pattern);
+        String actual = JsonUtils.prettyPrint(request.getBody());
         MatchResult result = matchResult(request);
+        MatchField field = new MatchField(FieldType.BODY, "body", expected);
         if (result.isMatch()) {
-            return true;
+            return field.asMatch(actual);
         } else {
-            LOGGER.debug("Failed to match request body: " + result.getReason());
-            return false;
+            return field.asMatchFailure(actual, result.message());
         }
     }
 
@@ -64,8 +68,8 @@ public class JsonBodyPattern extends BodyPattern {
      * property in the request body. All fields in pattern are assumed to
      * be regular expressions. All strings are converted to strings for matching.
      */
-    public MatchResult matchResult(StubMessage request) {
-        if (HttpMessageUtils.isJson(request) && request.getBody() != null) { // assert that request _has_ a body
+    private MatchResult matchResult(StubMessage request) {
+        if (HttpMessageUtils.isJson(request)) { // require a JSON body
             return matchValue(pattern, HttpMessageUtils.bodyAsJson(request), ""); // root could be any type (eg, an array)
         } else {
             return matchFailure("Expected content type: application/json", ".");
@@ -180,11 +184,11 @@ public class JsonBodyPattern extends BodyPattern {
     }
         
     private MatchResult matchFailure(String reason, String path) {
-        return new MatchResult(false, reason + " (at '" + path + "')");
+        return new MatchResult(false, path, reason);
     }
     
     private MatchResult matchSuccess() {
-        return new MatchResult(true, "Success");
+        return new MatchResult(true, null, null); // message & path ignored for success
     }
 
     @Override

@@ -23,7 +23,7 @@ public class StubServiceExchange { // wrap exchange model with some extra runtim
         this.attempts = new ArrayList<MatchResult>();
     }
     
-    public boolean matches(StubRequest message) throws URISyntaxException {
+    public MatchResult matches(StubRequest message) throws URISyntaxException {
         MatchResult result = requestPattern.matches(message);
         for (MatchField field : result.getFields()) {
             LOGGER.trace("Match outcome: " + field);
@@ -32,7 +32,7 @@ public class StubServiceExchange { // wrap exchange model with some extra runtim
         if (result.score() >= 5) { // only record attempts that match request path
             attempts.add(result);
         }
-        return result.matches();
+        return result;
     }
 
     public StubExchange getExchange() {

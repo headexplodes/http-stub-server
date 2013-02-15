@@ -12,6 +12,7 @@ import au.com.sensis.stubby.model.StubMessage;
 import au.com.sensis.stubby.model.StubParam;
 import au.com.sensis.stubby.model.StubRequest;
 import au.com.sensis.stubby.service.model.MatchField.FieldType;
+import au.com.sensis.stubby.utils.EqualsUtils;
 
 public class RequestPattern {
 
@@ -56,7 +57,7 @@ public class RequestPattern {
                 throw new RuntimeException("Unexpected body type: " + object);
             }
         } else {
-            return new EmptyBodyPattern();
+            return null; // don't match body
         }
     }
 
@@ -88,11 +89,10 @@ public class RequestPattern {
         }
 
         if (body != null) {
-            MatchField bodyField = new MatchField(FieldType.BODY, "body", body.expectedValue());
-            if (body.matches(message)) {
-                result.add(bodyField.asMatch(message.getBody()));
+            if (message.getBody() != null) {
+                result.add(body.matches(message));
             } else {
-                result.add(bodyField.asMatchFailure(message.getBody()));
+                result.add(new MatchField(FieldType.BODY, "body", "<pattern>").asNotFound());
             }
         }
 
@@ -148,7 +148,7 @@ public class RequestPattern {
                 && ((RequestPattern) obj).path.pattern().equals(path.pattern())
                 && ((RequestPattern) obj).params.equals(params)
                 && ((RequestPattern) obj).headers.equals(headers)
-                && ((RequestPattern) obj).body.equals(body);
+                && EqualsUtils.safeEquals(((RequestPattern) obj).body, body);
     }
     
     @Override
@@ -160,24 +160,12 @@ public class RequestPattern {
         return method;
     }
 
-    public void setMethod(Pattern method) {
-        this.method = method;
-    }
-
     public Pattern getPath() {
         return path;
     }
 
-    public void setPath(Pattern path) {
-        this.path = path;
-    }
-
     public BodyPattern getBody() {
         return body;
-    }
-
-    public void setBody(BodyPattern body) {
-        this.body = body;
     }
 
     public Set<ParamPattern> getParams() {

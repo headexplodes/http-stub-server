@@ -1,25 +1,32 @@
 package au.com.sensis.stubby.service.model;
 
+import java.util.List;
+
 import au.com.sensis.stubby.model.StubResponse;
 
 public class StubServiceResult { // returned by the 'findMatch' method
 
-    private boolean matchFound;
+    private List<MatchResult> attempts;
     private StubResponse response;
     private Long delay;
 
-    public StubServiceResult() {
-        this.matchFound = false;
+    public StubServiceResult(List<MatchResult> attempts) {
+        this.attempts = attempts;
     }
 
-    public StubServiceResult(StubResponse response, Long delay) {
-        this.matchFound = true;
+    public StubServiceResult(List<MatchResult> attempts, StubResponse response, Long delay) {
+        this.attempts = attempts;
         this.response = response;
         this.delay = delay;
     }
 
     public boolean matchFound() {
-        return matchFound;
+        for (MatchResult attempt : attempts) {
+            if (attempt.matches()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public StubResponse getResponse() {
@@ -28,6 +35,10 @@ public class StubServiceResult { // returned by the 'findMatch' method
 
     public Long getDelay() {
         return delay;
+    }
+
+    public List<MatchResult> getAttempts() {
+        return attempts;
     }
 
 }

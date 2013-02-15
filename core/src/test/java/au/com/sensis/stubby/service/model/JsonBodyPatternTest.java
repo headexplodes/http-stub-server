@@ -1,10 +1,14 @@
 package au.com.sensis.stubby.service.model;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
 
 import au.com.sensis.stubby.model.StubMessage;
 import au.com.sensis.stubby.model.StubRequest;
+import au.com.sensis.stubby.service.model.MatchField.FieldType;
+import au.com.sensis.stubby.service.model.MatchField.MatchType;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 public class JsonBodyPatternTest {
@@ -32,13 +36,16 @@ public class JsonBodyPatternTest {
         }
         
         public void matches(String request) {
-            JsonBodyPattern.MatchResult result = pattern.matchResult(message(request));
-            Assert.assertTrue(result.getReason(), result.isMatch());
+            MatchField result = pattern.matches(message(request));
+            assertEquals(FieldType.BODY, result.getFieldType());
+            assertEquals(MatchType.MATCH, result.getMatchType());
         }
         
         public void doesNotMatch(String request) {
-            JsonBodyPattern.MatchResult result = pattern.matchResult(message(request));
-            Assert.assertFalse(result.getReason(), result.isMatch());
+            MatchField result = pattern.matches(message(request));
+            assertEquals(FieldType.BODY, result.getFieldType());
+            assertEquals(MatchType.MATCH_FAILURE, result.getMatchType());
+            assertNotNull(result.getMessage());
         }   
     }
     
@@ -50,7 +57,7 @@ public class JsonBodyPatternTest {
     public void testInvalidContentType() throws Exception {
         StubMessage request = message("{}");
         request.setHeader("Content-Type", "text/plain");
-        Assert.assertFalse(pattern("{}").matches(request));
+        assertEquals(MatchType.MATCH_FAILURE, pattern("{}").matches(request).getMatchType());
     }
     
     @Test

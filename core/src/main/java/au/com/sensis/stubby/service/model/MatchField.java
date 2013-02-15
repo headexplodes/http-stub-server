@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 
+import au.com.sensis.stubby.utils.EqualsUtils;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 public class MatchField {
@@ -27,6 +28,7 @@ public class MatchField {
     private MatchType matchType;
     private Object expectedValue; // sometimes will be a Pattern, a JSON object etc.
     private Object actualValue; // could be string, JSON object etc.
+    private String message;
 
     public MatchField(FieldType fieldType, String fieldName, Object expectedValue) {
         this.fieldType = fieldType;
@@ -48,6 +50,13 @@ public class MatchField {
     public MatchField asMatchFailure(Object actualValue) {
         this.matchType = MatchType.MATCH_FAILURE;
         this.actualValue = actualValue;
+        return this;
+    }
+    
+    public MatchField asMatchFailure(Object actualValue, String message) {
+        this.matchType = MatchType.MATCH_FAILURE;
+        this.actualValue = actualValue;
+        this.message = message;
         return this;
     }
 
@@ -93,17 +102,16 @@ public class MatchField {
                     || !matchType.equals(other.matchType)) {
                 return false;
             }
-            if (!safeEquals(normalise(expectedValue), normalise(other.expectedValue))) {
+            if (!EqualsUtils.safeEquals(message, other.message)) {
+                return false;
+            }
+            if (!EqualsUtils.safeEquals(normalise(expectedValue), normalise(other.expectedValue))) {
                 return false;
             }
             return EqualsBuilder.reflectionEquals(actualValue, other.actualValue);
         } else {
             return false;
         }
-    }
-    
-    private boolean safeEquals(Object a, Object b) {
-        return (a == null && b == null) || (a != null && a.equals(b));
     }
     
     private Object normalise(Object value) {
@@ -132,6 +140,10 @@ public class MatchField {
 
     public Object getActualValue() {
         return actualValue;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
 }

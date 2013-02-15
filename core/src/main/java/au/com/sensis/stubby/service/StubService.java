@@ -1,5 +1,6 @@
 package au.com.sensis.stubby.service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -10,6 +11,7 @@ import au.com.sensis.stubby.js.Script;
 import au.com.sensis.stubby.js.ScriptWorld;
 import au.com.sensis.stubby.model.StubExchange;
 import au.com.sensis.stubby.model.StubRequest;
+import au.com.sensis.stubby.service.model.MatchResult;
 import au.com.sensis.stubby.service.model.StubServiceExchange;
 import au.com.sensis.stubby.service.model.StubServiceResult;
 import au.com.sensis.stubby.utils.JsonUtils;
@@ -32,23 +34,26 @@ public class StubService {
         try {
             LOGGER.trace("Got request: " + JsonUtils.prettyPrint(request));
             requests.addFirst(request);
+            List<MatchResult> attempts = new ArrayList<MatchResult>();
             for (StubServiceExchange response : responses) {
-                if (response.matches(request)) {
+                MatchResult matchResult = response.matches(request);
+                attempts.add(matchResult);
+                if (matchResult.matches()) {
                     LOGGER.info("Matched: " + request.getPath() + "");
                     StubExchange exchange = response.getExchange();
                     if (exchange.getScript() != null) {
                         ScriptWorld world = new ScriptWorld(exchange); // creates deep copies of objects
                         new Script(exchange.getScript()).execute(world);
                         return new StubServiceResult(
-                                world.getResponse(), world.getDelay());
+                                attempts, world.getResponse(), world.getDelay());
                     } else {
                         return new StubServiceResult(
-                                exchange.getResponse(), exchange.getDelay());
+                                attempts, exchange.getResponse(), exchange.getDelay());
                     }
                 }
             }
             LOGGER.info("Didn't match: " + request.getPath());
-            return new StubServiceResult(); // no match
+            return new StubServiceResult(attempts); // no match (empty list)
         } catch (Exception e) {
             throw new RuntimeException("Error matching request", e);
         }
@@ -87,6 +92,10 @@ public class StubService {
             throw new NotFoundException("Response does not exist: " + index);
         }
     }
+    
+//    public synchronized List<StubRequest> findRequest(RequestFilter filter) {
+//        // TODO
+//    }
 
     public synchronized List<StubRequest> getRequests() {
         return requests;

@@ -3,6 +3,7 @@ package au.com.sensis.stubby.service.model;
 import java.util.regex.Pattern;
 
 import au.com.sensis.stubby.model.StubMessage;
+import au.com.sensis.stubby.service.model.MatchField.FieldType;
 import au.com.sensis.stubby.utils.HttpMessageUtils;
 
 public class TextBodyPattern extends BodyPattern {
@@ -12,18 +13,19 @@ public class TextBodyPattern extends BodyPattern {
     public TextBodyPattern(String pattern) {
         this.pattern = Pattern.compile(pattern);
     }
-    
+
     @Override
-    public String expectedValue() {
-        return pattern.pattern();
-    }
-    
-    @Override
-    public boolean matches(StubMessage request) {
-        if (HttpMessageUtils.isText(request) && request.getBody() != null) { // require a body
-            return pattern.matcher(HttpMessageUtils.bodyAsText(request)).matches(); // match pattern against entire body
+    public MatchField matches(StubMessage request) {
+        String actual = HttpMessageUtils.bodyAsText(request);
+        MatchField field = new MatchField(FieldType.BODY, "body", pattern.pattern());
+        if (HttpMessageUtils.isText(request)) { // require text body
+            if (pattern.matcher(actual).matches()) { // match pattern against entire body
+                return field.asMatch(actual);
+            } else {
+                return field.asMatchFailure(actual);
+            }
         } else {
-            return false; // expected textual content
+            return field.asMatchFailure(actual, "Expected content type: text/*"); 
         }
     }
 

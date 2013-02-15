@@ -3,10 +3,12 @@ package au.com.sensis.stubby.service.model;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,13 @@ public class RequestPatternTest {
         instance2 = new RequestPattern(stubbedRequest);
     }
         
+    private void assertNotFound(MatchResult result, MatchField.FieldType type, String name, String expected) {
+        MatchField expectedField = new MatchField(type, name, expected).asNotFound();
+        
+        assertFalse(result.matches());
+        assertThat(result.getFields(), hasItem(expectedField));
+    }
+    
     private void assertMatchFailure(MatchResult result, MatchField.FieldType type, String name, String expected, String actual) {
         MatchField expectedField = new MatchField(type, name, expected).asMatchFailure(actual);
         
@@ -53,7 +62,7 @@ public class RequestPatternTest {
     }
     
     private void assertMatchSuccess(MatchResult result, MatchField.FieldType type, String name, String expected, String actual) {
-        MatchField expectedField = new MatchField(type, name, expected).asMatchFailure(actual);
+        MatchField expectedField = new MatchField(type, name, expected).asMatch(actual);
         
         assertTrue(result.matches());
         assertThat(result.getFields(), hasItem(expectedField));
@@ -91,7 +100,7 @@ public class RequestPatternTest {
         
         assertEquals(".*", instance1.getMethod().pattern());
         assertEquals(".*", instance1.getPath().pattern());
-        assertEquals(new EmptyBodyPattern(), instance1.getBody());
+        assertNull(instance1.getBody());
     }
     
     @Test
@@ -121,9 +130,11 @@ public class RequestPatternTest {
         
         assertTrue(result.matches());
         
-        assertMatchFailure(result, MatchField.FieldType.BODY, "body", "body .*", null);
-        
-        TODO: assert each field was in success
+        assertMatchSuccess(result, MatchField.FieldType.METHOD, "method", "PO.*", "POST");
+        assertMatchSuccess(result, MatchField.FieldType.PATH, "path", "/request/.*", "/request/path");
+        assertMatchSuccess(result, MatchField.FieldType.BODY, "body", "body .*", "body pattern");
+        assertMatchSuccess(result, MatchField.FieldType.QUERY_PARAM, "foo", "b.r", "bar");
+        assertMatchSuccess(result, MatchField.FieldType.HEADER, "Content-Type", "text/plain; .+", "text/plain; charset=UTF-8");
     }
     
     @Test
@@ -147,6 +158,15 @@ public class RequestPatternTest {
     }
     
     @Test
+    public void testNoMatchNoParams() {
+        incomingRequest.setParams(Collections.EMPTY_LIST);
+        
+        MatchResult result = instance1.matches(incomingRequest);
+        
+        assertNotFound(result, MatchField.FieldType.QUERY_PARAM, "foo", "b.r");
+    }
+    
+    @Test
     public void testMatchesExtraHeaders() {
         incomingRequest.setHeaders(Arrays.asList(
                 new StubParam("Content-Type", "text/plain; .+"),
@@ -167,6 +187,15 @@ public class RequestPatternTest {
     }
     
     @Test
+    public void testNoMatchNoHeaders() {
+        incomingRequest.setHeaders(Collections.EMPTY_LIST);
+        
+        MatchResult result = instance1.matches(incomingRequest);
+        
+        assertNotFound(result, MatchField.FieldType.HEADER, "Content-Type", "text/plain; .+");
+    }
+    
+    @Test
     public void testNoMatchWrongBody() {
         incomingRequest.setBody("wrong body");
         
@@ -181,7 +210,7 @@ public class RequestPatternTest {
         
         MatchResult result = instance1.matches(incomingRequest);
         
-        assertMatchFailure(result, MatchField.FieldType.BODY, "body", "body .*", null);
+        assertNotFound(result, MatchField.FieldType.BODY, "body", "<pattern>");
     }
     
     @Test
@@ -192,7 +221,5 @@ public class RequestPatternTest {
         
         assertMatchFailure(result, MatchField.FieldType.METHOD, "method", "PO.*", "HEAD");
     }
-    
-    // TODO: assert each field not found
     
 }
