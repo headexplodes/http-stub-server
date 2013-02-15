@@ -10,12 +10,13 @@ import org.junit.Test;
 import au.com.sensis.stubby.model.StubExchange;
 import au.com.sensis.stubby.model.StubRequest;
 import au.com.sensis.stubby.model.StubResponse;
+import au.com.sensis.stubby.service.model.StubServiceExchange;
 import au.com.sensis.stubby.service.model.StubServiceResult;
 
 public class StubServiceTest {
 
     private static final Integer OK = 200;
-    private static final Integer NOT_FOUND = 404;
+    private static final Integer CREATED = 201;
     private static final Integer SERVER_ERROR = 500;
 
     private StubRequest request; // incoming request
@@ -53,7 +54,7 @@ public class StubServiceTest {
         exchange.getRequest().setMethod("G.T");
         service.addResponse(new StubExchange(exchange)); // create copy
 
-        exchange.getResponse().setStatus(NOT_FOUND);
+        exchange.getResponse().setStatus(CREATED);
         exchange.getRequest().setMethod("GE."); // make sure patterns differ (or they will overwrite eachother)
         service.addResponse(new StubExchange(exchange));
 
@@ -62,12 +63,20 @@ public class StubServiceTest {
 
     @Test
     public void testMatch() {
-        service.addResponse(exchange);
-
         StubServiceResult result = service.findMatch(request);
 
         assertTrue(result.matchFound());
-        assertEquals(NOT_FOUND, result.getResponse().getStatus());
+        assertEquals(CREATED, result.getResponse().getStatus()); // most recent stubbed first
+        assertEquals(1, result.getAttempts().size()); // ensure attempts returned
+    }
+    
+    @Test
+    public void testAttemptRecorded() {
+        service.findMatch(request);
+
+        StubServiceExchange response = service.getResponse(0);
+        assertEquals(1, response.getAttempts().size());
+        assertTrue(response.getAttempts().get(0).matches());
     }
 
     @Test
@@ -77,14 +86,6 @@ public class StubServiceTest {
 
         assertFalse(service.getResponses().isEmpty());
         assertFalse(service.findMatch(request).matchFound());
-    }
-
-    @Test
-    public void testMatchOrder() {
-        StubServiceResult result = service.findMatch(request);
-
-        assertTrue(result.matchFound());
-        assertEquals(NOT_FOUND, result.getResponse().getStatus()); // most recent stubbed first
     }
 
     @Test
@@ -106,7 +107,7 @@ public class StubServiceTest {
 
     @Test
     public void testGetResponses() {
-        assertEquals(NOT_FOUND, service.getResponses().get(0).getExchange().getResponse().getStatus()); // most recent first
+        assertEquals(CREATED, service.getResponses().get(0).getExchange().getResponse().getStatus()); // most recent first
         assertEquals(OK, service.getResponses().get(1).getExchange().getResponse().getStatus());
     }
 
@@ -152,11 +153,11 @@ public class StubServiceTest {
         exchange.getResponse().setStatus(OK);
         service.addResponse(new StubExchange(exchange)); // create copies
 
-        exchange.getResponse().setStatus(NOT_FOUND);
+        exchange.getResponse().setStatus(CREATED);
         service.addResponse(new StubExchange(exchange));
 
         assertEquals(1, service.getResponses().size());
-        assertEquals(NOT_FOUND, // ensure last stubbed request is kept
+        assertEquals(CREATED, // ensure last stubbed request is kept
                 service.getResponses().get(0).getExchange().getResponse().getStatus());
     }
 
