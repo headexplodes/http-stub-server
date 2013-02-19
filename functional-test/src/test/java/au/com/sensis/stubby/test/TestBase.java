@@ -14,11 +14,26 @@ import org.junit.Before;
 
 public abstract class TestBase {
 
+    private static final String P_TEST_SERVER = "test.server"; // server to test against
+    
     private Client client;
 
+    protected String getStandaloneServer() {
+        if (!TestServer.isRunning()) { // keep running for all tests
+            TestServer.start();
+        }
+        return String.format("http://localhost:%d", TestServer.getPort());
+    }
+    
     @Before
     public void before() {
-        client = new Client("http://localhost:9001"); // TODO: make configurable...
+        String testServer = System.getProperty(P_TEST_SERVER);
+        
+        if (testServer == null) { // property not given, start internal server
+            testServer = getStandaloneServer();
+        }
+
+        client = new Client(testServer);
         client.reset();
     }
 

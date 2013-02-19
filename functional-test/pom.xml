@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>au.com.sensis</groupId>
-            <artifactId>http-stub-server-core</artifactId>
+            <artifactId>http-stub-server-standalone</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 

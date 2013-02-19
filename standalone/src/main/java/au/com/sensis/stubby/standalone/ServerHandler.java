@@ -16,15 +16,15 @@ import au.com.sensis.stubby.utils.JsonUtils;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-public class Server implements HttpHandler {
+public class ServerHandler implements HttpHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(Server.class);
+    private static final Logger LOGGER = Logger.getLogger(ServerHandler.class);
 
     private StubService service;
     private JsonServiceInterface jsonService;
     private Thread shutdownHook; // if set, use for graceful shutdown
 
-    public Server() {
+    public ServerHandler() {
         this.service = new StubService();
         this.jsonService = new JsonServiceInterface(service);
     }
@@ -128,7 +128,6 @@ public class Server implements HttpHandler {
     private void handleResponses(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         if (method.equals("POST")) {
-            //StubServiceExchange stubbedResponse = parseJsonBody(exchange, StubServiceExchange.class);
             jsonService.addResponse(exchange.getRequestBody());
             returnOk(exchange);
         } else if (method.equals("DELETE")) {
