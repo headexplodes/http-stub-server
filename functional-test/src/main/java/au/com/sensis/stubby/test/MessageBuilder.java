@@ -17,33 +17,38 @@ public class MessageBuilder {
         return this;
     }
     
+    public MessageBuilder script(String script) {
+        exchange.script = script;
+        return this;
+    }
+    
     public MessageBuilder method(String method) {
-        exchange.request.method = method;
+        exchange.request().method = method;
         return this;
     }
 
     public MessageBuilder path(String path) {
-        exchange.request.path = path;
+        exchange.request().path = path;
         return this;
     }
 
     public MessageBuilder status(Integer status) {
-        exchange.response.status = status;
+        exchange.response().status = status;
         return this;
     }
 
     public MessageBuilder body(Object body) {
-        exchange.response.body = body;
+        exchange.response().body = body;
         return this;
     }
 
     public MessageBuilder query(String name, String value) {
-        exchange.request.setParam(name, value);
+        exchange.request().setParam(name, value);
         return this;
     }
 
     public MessageBuilder addQuery(String name, String value) {
-        exchange.request.addParam(name, value);
+        exchange.request().addParam(name, value);
         return this;
     }
 
