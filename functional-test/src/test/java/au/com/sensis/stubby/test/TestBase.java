@@ -2,8 +2,8 @@ package au.com.sensis.stubby.test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -12,11 +12,13 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
+import au.com.sensis.stubby.test.model.JsonExchangeList;
+
 public abstract class TestBase {
 
     private static final String P_TEST_SERVER = "test.server"; // server to test against
-    
-    private Client client;
+
+    protected Client client;
 
     protected String getStandaloneServer() {
         if (!TestServer.isRunning()) { // keep running for all tests
@@ -24,11 +26,11 @@ public abstract class TestBase {
         }
         return String.format("http://localhost:%d", TestServer.getPort());
     }
-    
+
     @Before
     public void before() {
         String testServer = System.getProperty(P_TEST_SERVER);
-        
+
         if (testServer == null) { // property not given, start internal server
             testServer = getStandaloneServer();
         }
@@ -46,7 +48,11 @@ public abstract class TestBase {
         String path = "/tests/" + filename;
         InputStream resource = getClass().getResourceAsStream(path);
         if (resource != null) {
-            client.postMessage(resource);
+            try {
+                client.postMessage(IOUtils.toString(resource));
+            } catch (IOException e) {
+                throw new RuntimeException("Error posting file", e);
+            }
         } else {
             throw new RuntimeException("Resource not found: " + path);
         }
@@ -60,39 +66,26 @@ public abstract class TestBase {
         HttpClientUtils.closeQuietly(response);
     }
 
-    protected HttpResponse execute(HttpUriRequest request) {
-        try {
-            return client.execute(request);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    protected GenericClientResponse execute(HttpUriRequest request) {
+        return client.execute(request);
     }
 
     protected Client client() {
         return client;
     }
-    
-    protected List<MessageBuilder> responses() {
+
+    protected JsonExchangeList responses() {
         return client.getResponses();
     }
 
-    protected void assertOk(HttpUriRequest request) {
-        HttpResponse response = execute(request);
-        try {
-            assertOk(response);
-        } finally {
-            close(response);
-        }
-    }
-
-    protected void assertOk(HttpResponse response) {
+    protected void assertOk(GenericClientResponse response) {
         assertStatus(HttpStatus.SC_OK, response);
     }
 
-    protected void assertStatus(int status, HttpResponse response) {
-        Assert.assertEquals(status, response.getStatusLine().getStatusCode());
+    protected void assertStatus(int status, GenericClientResponse response) {
+        Assert.assertEquals(status, response.getStatus());
     }
-    
+
     protected MessageBuilder builder() {
         return new MessageBuilder(client);
     }

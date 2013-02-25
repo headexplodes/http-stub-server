@@ -2,9 +2,9 @@ package au.com.sensis.stubby.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
-
 import org.junit.Test;
+
+import au.com.sensis.stubby.test.model.JsonExchangeList;
 
 /*
  * When two identical request patterns are stubbed, the previous one should be deleted
@@ -17,9 +17,9 @@ public class DuplicateRequestPatternTest extends TestBase {
         for (MessageBuilder message : messages) {
             message.status(status++).stub();
 
-            List<MessageBuilder> responses = responses();
+            JsonExchangeList responses = responses();
             assertEquals(1, responses.size());
-            assertEquals(status, responses.get(0).response.statusCode);
+            assertEquals(status, (int)responses.get(0).response.status);
 
             status++;
         }
@@ -31,19 +31,40 @@ public class DuplicateRequestPatternTest extends TestBase {
         for (MessageBuilder message : messages) {
             message.status(status++).stub();
 
-            List<MessageBuilder> responses = responses();
+            JsonExchangeList responses = responses();
             assertEquals(status, responses.size()); // size should grow
-            assertEquals(status, responses.get(0).response.statusCode);
+            assertEquals(status, (int)responses.get(0).response.status);
 
             status++;
         }
     }
 
     @Test
-    public void minimal() {
+    public void pathSame() {
         assertSame(
                 builder().path("/foo"),
                 builder().path("/foo"));
+    }
+    
+    @Test
+    public void pathDiffers() {
+        assertSame(
+                builder().path("/foo1"),
+                builder().path("/foo2"));
+    }
+    
+    @Test
+    public void querySame() {
+        assertSame(
+                builder().path("/foo").query("foo", "bar"),
+                builder().path("/foo").query("foo", "bar"));
+    }    
+    
+    @Test
+    public void queryDiffers() {
+        assertSame(
+                builder().path("/foo").query("foo", "bar1"),
+                builder().path("/foo").query("foo", "bar2"));
     }
 
 }

@@ -3,14 +3,13 @@ package au.com.sensis.stubby.standalone;
 import java.io.IOException;
 
 import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpsServer;
 
 public class HttpServerInstance extends ServerInstance {
 
     private HttpServer server;
 
     public HttpServerInstance(int port, ServerHandler handler) throws IOException {
-        this.server = HttpsServer.create(allInterfaces(port), SOCKET_BACKLOG);
+        this.server = HttpServer.create(allInterfaces(port), SOCKET_BACKLOG);
         this.server.createContext("/", handler);
         this.server.start();
     }
