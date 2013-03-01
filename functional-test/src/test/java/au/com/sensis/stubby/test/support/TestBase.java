@@ -1,4 +1,4 @@
-package au.com.sensis.stubby.test;
+package au.com.sensis.stubby.test.support;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +12,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
-import au.com.sensis.stubby.test.model.JsonExchangeList;
+import au.com.sensis.stubby.test.Client;
+import au.com.sensis.stubby.test.GenericClientResponse;
+import au.com.sensis.stubby.test.MessageBuilder;
+import au.com.sensis.stubby.test.model.JsonStubbedExchangeList;
 
 public abstract class TestBase {
 
@@ -74,12 +77,16 @@ public abstract class TestBase {
         return client;
     }
 
-    protected JsonExchangeList responses() {
+    protected JsonStubbedExchangeList responses() {
         return client.getResponses();
     }
 
     protected void assertOk(GenericClientResponse response) {
         assertStatus(HttpStatus.SC_OK, response);
+    }
+    
+    protected void assertNotFound(GenericClientResponse response) {
+        assertStatus(HttpStatus.SC_NOT_FOUND, response);
     }
 
     protected void assertStatus(int status, GenericClientResponse response) {

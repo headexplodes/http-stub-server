@@ -37,8 +37,13 @@ public class MessageBuilder {
         return this;
     }
 
-    public MessageBuilder body(Object body) {
+    public MessageBuilder responseBody(Object body) {
         exchange.response().body = body;
+        return this;
+    }
+    
+    public MessageBuilder requestBody(Object body) {
+        exchange.request().body = body;
         return this;
     }
 

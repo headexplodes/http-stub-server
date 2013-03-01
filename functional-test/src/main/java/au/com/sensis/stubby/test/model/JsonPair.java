@@ -1,13 +1,15 @@
 package au.com.sensis.stubby.test.model;
 
 public class JsonPair {
-
-    public String value;
-    public String name;
     
-    public JsonPair(String value, String name) {
-        this.value = value;
+    public String name;
+    public String value;
+    
+    public JsonPair() { } // for Jackson
+    
+    public JsonPair(String name, String value) {
         this.name = name;
+        this.value = value;
     }
 
 }

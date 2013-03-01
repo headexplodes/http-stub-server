@@ -42,7 +42,7 @@ public class StubService {
                     LOGGER.info("Matched: " + request.getPath() + "");
                     StubExchange exchange = response.getExchange();
                     if (exchange.getScript() != null) {
-                        ScriptWorld world = new ScriptWorld(exchange); // creates deep copies of objects
+                        ScriptWorld world = new ScriptWorld(request, exchange); // creates deep copies of objects
                         new Script(exchange.getScript()).execute(world);
                         return new StubServiceResult(
                                 attempts, world.getResponse(), world.getDelay());

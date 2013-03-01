@@ -10,22 +10,33 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 
 public abstract class GenericClient {
 
+    private static final int MAX_CONNECTIONS = 10;
+    
     private URI baseUri;
     private HttpClient httpClient;
 
     public GenericClient(String baseUri) {
         try {
             this.baseUri = new URI(baseUri);
-            this.httpClient = new DefaultHttpClient();
+            this.httpClient = new DefaultHttpClient(createConnectionManager());
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Invalid URI", e);
         }
+    }
+    
+    private ClientConnectionManager createConnectionManager() {
+        PoolingClientConnectionManager manager = new PoolingClientConnectionManager();
+        manager.setDefaultMaxPerRoute(MAX_CONNECTIONS);
+        manager.setMaxTotal(MAX_CONNECTIONS);
+        return manager;
     }
 
     public void close() {
@@ -54,7 +65,7 @@ public abstract class GenericClient {
     
     public GenericClientResponse execute(HttpUriRequest request) {
         try {
-            return new GenericClientResponse(httpClient.execute(request));
+           return new GenericClientResponse(httpClient.execute(request)); // consumes & releases connection
         } catch (IOException e) {
             throw new RuntimeException(String.format("Error executing '%s' to '%s'", request.getMethod(), request.getURI()), e);
         }

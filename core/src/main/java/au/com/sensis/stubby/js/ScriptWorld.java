@@ -10,10 +10,10 @@ public class ScriptWorld { // the world as JavaScript sees it
     private StubResponse response;
     private Long delay;
     
-    public ScriptWorld(StubExchange exchange) { // copy everything so the script can't change the server state
-        this.request = new StubRequest(exchange.getRequest());
-        this.response = new StubResponse(exchange.getResponse());
-        this.delay = exchange.getDelay();
+    public ScriptWorld(StubRequest request, StubExchange response) { // copy everything so the script can't change the server state
+        this.request = new StubRequest(request);
+        this.response = new StubResponse(response.getResponse());
+        this.delay = response.getDelay();
     }
 
     public StubRequest getRequest() {

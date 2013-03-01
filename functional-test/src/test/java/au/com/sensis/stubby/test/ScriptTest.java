@@ -1,18 +1,36 @@
 package au.com.sensis.stubby.test;
 
-import org.apache.http.client.methods.HttpGet;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
-public class ScriptTest extends TestBase {
-       
-    @Test
-    public void scriptTest() {
-        String script = "if (request.getParam('run') == 'true') { response.statusCode = 200; response.body = request.getParam('run'); }";
-        
-        builder().path("/script/bar").status(500).body("Sup?").script(script).stub();
+import au.com.sensis.stubby.test.support.TestBase;
 
-        assertOk(client.executeGet("/script/bar?run=true"));
-        assertStatus(500, execute(new HttpGet(makeUri("/script/bar?run=false"))));
+public class ScriptTest extends TestBase {
+
+    private static final String TEST_SCRIPT = 
+            "if (request.getParam('run') == 'true') { exchange.response.status = 202; exchange.response.body = exchange.request.getParam('run'); }";
+            
+    private void givenTestScript() {
+        builder().path("/script/bar").status(201).responseBody("original").script(TEST_SCRIPT).stub();
+    }
+    
+    @Test
+    public void testRunFalse() {
+        givenTestScript();
+        
+        GenericClientResponse result = client.executeGet("/script/bar?run=false");
+        assertEquals(201, result.getStatus());
+        assertEquals("original", result.getText());
+    }
+    
+    @Test
+    public void testRunTrue() {
+        givenTestScript();
+        
+        GenericClientResponse result = client.executeGet("/script/bar?run=true");
+        assertEquals(202, result.getStatus());
+        assertEquals("true", result.getText());
     }
 
 }

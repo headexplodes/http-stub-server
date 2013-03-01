@@ -80,7 +80,7 @@ public class ScriptTest {
     }
     
     private Object execute(String script) {
-        world = new ScriptWorld(exchange);
+        world = new ScriptWorld(request, exchange);
         return new Script(script).execute(world);
     }
     
@@ -110,6 +110,7 @@ public class ScriptTest {
         assertEquals("POST", execute("exchange.request.method"));
         assertEquals("/request/path", execute("exchange.request.path"));
         assertEquals("bar", execute("exchange.request.getParams('foo').get(0)"));
+        assertEquals("bar", execute("exchange.request.getParam('foo')"));
         assertEquals("text/plain", execute("exchange.request.getHeader('content-type')")); // ensure case insensitive
         assertEquals("request body", execute("exchange.request.body"));
     }

@@ -136,7 +136,7 @@ public class StubServiceTest {
 
     @Test
     public void testScriptExecuted() {
-        exchange.setScript("exchange.response.status = 500; exchange.delay = 666");
+        exchange.setScript("exchange.response.status = 500; exchange.delay = 666; exchange.response.body = exchange.request.path");
         service.addResponse(exchange);
 
         StubServiceResult result = service.findMatch(request);
@@ -144,6 +144,7 @@ public class StubServiceTest {
         assertTrue(result.matchFound());
         assertEquals(SERVER_ERROR, result.getResponse().getStatus());
         assertEquals(new Long(666), result.getDelay());
+        assertEquals("/foo", result.getResponse().getBody());
     }
 
     @Test

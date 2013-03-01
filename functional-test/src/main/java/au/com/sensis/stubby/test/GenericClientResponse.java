@@ -1,10 +1,12 @@
 package au.com.sensis.stubby.test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.util.EntityUtils;
 
 import au.com.sensis.stubby.utils.JsonUtils;
@@ -12,35 +14,61 @@ import au.com.sensis.stubby.utils.JsonUtils;
 public class GenericClientResponse {
 
     private HttpResponse response;
+    private String body;
 
     public GenericClientResponse(HttpResponse response) {
         this.response = response;
+        this.body = consumeBody(response); // always read body in to memory
     }
 
-    public void close() {
-        if (hasBody()) {
-            EntityUtils.consumeQuietly(response.getEntity()); // ensure we've read everything
+    private static String consumeBody(HttpResponse response) {
+        try {
+            if (response.getEntity() != null && response.getEntity().getContent() != null) {
+                return EntityUtils.toString(response.getEntity(), "UTF-8"); // releases connection
+            } else {
+                return null; // no body
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading response body", e);
         }
-        HttpClientUtils.closeQuietly(response);
     }
 
     public boolean hasBody() {
-        try {
-            return response.getEntity() != null && response.getEntity().getContent() != null;
-        } catch (IOException e) {
-            throw new RuntimeException("Error getting entity", e);
-        }
+        return body != null;
     }
 
     public int getStatus() {
         return response.getStatusLine().getStatusCode();
+    }
+    
+    public String getHeader(String name) {
+        if (response.getFirstHeader(name) != null) {
+            return response.getFirstHeader(name).getValue();
+        } else {
+            return null;
+        }
+    }
+    
+    public List<String> getHeaders(String name) {
+        List<String> result = new ArrayList<String>();
+        for (Header header : response.getHeaders(name)) {
+            result.add(header.getValue());
+        }
+        return result;
     }
 
     public GenericClientResponse assertOk() {
         if (!isOk()) {
             throw new RuntimeException("Server returned " + getStatus());
         }
-        return this; // helpful for chaining method calls
+        return this;
+    }
+    
+    public GenericClientResponse assertBody() {
+        if (!hasBody()) {
+            throw new RuntimeException("Response body expected");
+        }
+        return this;
     }
 
     public boolean isOk() {
@@ -48,29 +76,13 @@ public class GenericClientResponse {
     }
 
     public <T> T getJson(Class<T> type) {
-        if (hasBody()) {
-            try {
-                return JsonUtils.deserialize(response.getEntity().getContent(), type);
-            } catch (IOException e) {
-                throw new RuntimeException("Error getting entity", e);
-            } finally {
-                close();
-            }
-        } else {
-            throw new IllegalStateException("Response does not have a body");
-        }
+        assertBody();
+        return JsonUtils.deserialize(body, type);
     }
 
-    public String getText() throws IOException {
-        if (hasBody()) {
-            try {
-                return EntityUtils.toString(response.getEntity(), "UTF-8");
-            } finally {
-                close();
-            }
-        } else {
-            throw new IllegalStateException("Response does not have a body");
-        }
+    public String getText() {
+        assertBody();
+        return body;
     }
 
 }

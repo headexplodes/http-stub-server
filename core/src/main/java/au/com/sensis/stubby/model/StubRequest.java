@@ -20,7 +20,7 @@ public class StubRequest extends StubMessage {
         if (other.params != null) {
             this.params = new ArrayList<StubParam>();
             for (StubParam param : other.params) {
-                params.add(new StubParam(param));
+                this.params.add(new StubParam(param));
             }
         }
     }

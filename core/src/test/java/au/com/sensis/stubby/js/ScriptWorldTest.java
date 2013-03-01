@@ -1,5 +1,6 @@
 package au.com.sensis.stubby.js;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -11,24 +12,30 @@ import au.com.sensis.stubby.model.StubResponse;
 
 public class ScriptWorldTest {
 
-    private StubExchange exchange;
+    private StubRequest request;
+    private StubExchange response;
     
     @Before
     public void before() {
-        exchange = new StubExchange();
-        exchange.setRequest(new StubRequest());
-        exchange.setResponse(new StubResponse());
-        exchange.setDelay(123L);
+        request = new StubRequest();
+        request.setPath("/request/path");
+        
+        response = new StubExchange();
+        response.setResponse(new StubResponse());
+        response.setRequest(new StubRequest());
+        response.setDelay(123L);
     }
     
     @Test
     public void testCopiesFields() {
-        ScriptWorld world = new ScriptWorld(exchange);
+        ScriptWorld world = new ScriptWorld(request, response);
         
-        assertTrue(world.getRequest() != exchange.getRequest()); // should be different instances
-        assertTrue(world.getResponse() != exchange.getResponse());
+        assertTrue(world.getRequest() != response.getRequest()); // should be different instances
+        assertTrue(world.getResponse() != response.getResponse());
+        
+        assertEquals("/request/path", world.getRequest().getPath()); // ensure we use the acutal request, not request pattern
 
-        assertTrue(world.getDelay().equals(exchange.getDelay())); // immutable anyway...
+        assertTrue(world.getDelay().equals(response.getDelay())); // immutable anyway...
     }
     
 }

@@ -1,4 +1,4 @@
-package au.com.sensis.stubby.test;
+package au.com.sensis.stubby.test.support;
 
 import au.com.sensis.stubby.standalone.HttpServerInstance;
 import au.com.sensis.stubby.standalone.ServerHandler;
