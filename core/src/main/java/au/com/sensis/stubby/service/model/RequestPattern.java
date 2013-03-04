@@ -61,7 +61,7 @@ public class RequestPattern {
         }
     }
 
-    public MatchResult matches(StubRequest message) {
+    public MatchResult match(StubRequest message) {
         MatchResult result = new MatchResult();
 
         MatchField methodField = new MatchField(MatchField.FieldType.METHOD, "method", method);

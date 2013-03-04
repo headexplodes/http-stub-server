@@ -12,7 +12,7 @@ public class ScriptTest extends TestBase {
             "if (request.getParam('run') == 'true') { exchange.response.status = 202; exchange.response.body = exchange.request.getParam('run'); }";
             
     private void givenTestScript() {
-        builder().path("/script/bar").status(201).responseBody("original").script(TEST_SCRIPT).stub();
+        builder().setRequestPath("/script/bar").setResponseStatus(201).setResponseBody("original").setScript(TEST_SCRIPT).stub();
     }
     
     @Test

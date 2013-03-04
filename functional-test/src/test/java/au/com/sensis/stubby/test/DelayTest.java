@@ -13,7 +13,7 @@ public class DelayTest extends TestBase {
         long millis = 2000;
         long tollerance = 500;
         
-        builder().path("/foo").status(200).delay(millis).stub();
+        builder().setRequestPath("/foo").setResponseStatus(200).setDelay(millis).stub();
         
         long started = System.currentTimeMillis();
         assertOk(client.executeGet("/foo"));

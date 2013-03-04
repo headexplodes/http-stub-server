@@ -51,7 +51,7 @@ public class LoadTest extends TestBase {
             String path =  "/loadTest/" + index;
             String body = "Test No. " + index;
             
-            builder().path(path).responseBody(body).status(200).stub();
+            builder().setRequestPath(path).setResponseBody(body).setResponseStatus(200).stub();
             
             String actual = client.executeGet(path).assertOk().getText();
             if (body.equals(actual)) {

@@ -18,6 +18,7 @@ public class JsonUtils {
     public static ObjectMapper defaultMapper() {
         ObjectMapper result = mapper();
         result.enable(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES);
+        result.enable(DeserializationConfig.Feature.USE_BIG_DECIMAL_FOR_FLOATS); // for 'exact' floating-point matches
         result.setSerializationInclusion(Inclusion.NON_NULL);
         return result;
     }

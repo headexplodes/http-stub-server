@@ -15,7 +15,7 @@ public class JsonBodyPatternTest extends TestBase {
     public void emptyPattern() {
         Map pattern = new HashMap();
         
-        builder().path("/foo").status(200).requestBody(pattern).stub();
+        builder().setRequestPath("/foo").setResponseStatus(200).setRequestBody(pattern).stub();
         
         assertOk(client.executePost("/foo", "{}", ContentType.APPLICATION_JSON));
     }
@@ -25,7 +25,7 @@ public class JsonBodyPatternTest extends TestBase {
         Map pattern = new HashMap();
         pattern.put("key_a", "value_a");
         
-        builder().path("/foo").status(200).requestBody(pattern).stub();
+        builder().setRequestPath("/foo").setResponseStatus(200).setRequestBody(pattern).stub();
         
         assertOk(client.executePost("/foo", "{\"key_a\":\"value_a\", \"key_b\":\"value_b\"}", ContentType.APPLICATION_JSON));
     }
@@ -35,7 +35,7 @@ public class JsonBodyPatternTest extends TestBase {
         Map pattern = new HashMap();
         pattern.put("key_a", "incorrect");
         
-        builder().path("/foo").status(200).requestBody(pattern).stub();
+        builder().setRequestPath("/foo").setResponseStatus(200).setRequestBody(pattern).stub();
         
         assertNotFound(client.executePost("/foo", "{\"key_a\":\"value_a\", \"key_b\":\"value_b\"}", ContentType.APPLICATION_JSON));
     }
@@ -44,7 +44,7 @@ public class JsonBodyPatternTest extends TestBase {
     public void notJson() {
         Map pattern = new HashMap();
         
-        builder().path("/foo").status(200).requestBody(pattern).stub();
+        builder().setRequestPath("/foo").setResponseStatus(200).setRequestBody(pattern).stub();
         
         assertNotFound(client.executePost("/foo", "{}", ContentType.TEXT_PLAIN));
     }

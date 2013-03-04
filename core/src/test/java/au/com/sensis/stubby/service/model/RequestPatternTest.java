@@ -126,7 +126,7 @@ public class RequestPatternTest {
     
     @Test
     public void testMatches() {
-        MatchResult result = instance1.matches(incomingRequest);
+        MatchResult result = instance1.match(incomingRequest);
         
         assertTrue(result.matches());
         
@@ -143,7 +143,7 @@ public class RequestPatternTest {
                 new StubParam("foo", "bar"),
                 new StubParam("foo", "asdfasdf")));
         
-        MatchResult result = instance1.matches(incomingRequest);
+        MatchResult result = instance1.match(incomingRequest);
         
         assertTrue(result.matches());
     }
@@ -152,7 +152,7 @@ public class RequestPatternTest {
     public void testNoMatchWrongParams() {
         incomingRequest.setParams(Arrays.asList(new StubParam("foo", "asdf")));
         
-        MatchResult result = instance1.matches(incomingRequest);
+        MatchResult result = instance1.match(incomingRequest);
         
         assertMatchFailure(result, MatchField.FieldType.QUERY_PARAM, "foo", "b.r", "asdf");
     }
@@ -161,7 +161,7 @@ public class RequestPatternTest {
     public void testNoMatchNoParams() {
         incomingRequest.setParams(Collections.EMPTY_LIST);
         
-        MatchResult result = instance1.matches(incomingRequest);
+        MatchResult result = instance1.match(incomingRequest);
         
         assertNotFound(result, MatchField.FieldType.QUERY_PARAM, "foo", "b.r");
     }
@@ -172,7 +172,7 @@ public class RequestPatternTest {
                 new StubParam("Content-Type", "text/plain; .+"),
                 new StubParam("Content-Type", "application/json")));
         
-        MatchResult result = instance1.matches(incomingRequest);
+        MatchResult result = instance1.match(incomingRequest);
         
         assertTrue(result.matches());
     }
@@ -181,7 +181,7 @@ public class RequestPatternTest {
     public void testNoMatchWrongHeaders() {
         incomingRequest.setHeaders(Arrays.asList(new StubParam("Content-Type", "image/gif")));
         
-        MatchResult result = instance1.matches(incomingRequest);
+        MatchResult result = instance1.match(incomingRequest);
         
         assertMatchFailure(result, MatchField.FieldType.HEADER, "Content-Type", "text/plain; .+", "image/gif");
     }
@@ -190,7 +190,7 @@ public class RequestPatternTest {
     public void testNoMatchNoHeaders() {
         incomingRequest.setHeaders(Collections.EMPTY_LIST);
         
-        MatchResult result = instance1.matches(incomingRequest);
+        MatchResult result = instance1.match(incomingRequest);
         
         assertNotFound(result, MatchField.FieldType.HEADER, "Content-Type", "text/plain; .+");
     }
@@ -199,7 +199,7 @@ public class RequestPatternTest {
     public void testNoMatchWrongBody() {
         incomingRequest.setBody("wrong body");
         
-        MatchResult result = instance1.matches(incomingRequest);
+        MatchResult result = instance1.match(incomingRequest);
         
         assertMatchFailure(result, MatchField.FieldType.BODY, "body", "body .*", "wrong body");
     }
@@ -208,7 +208,7 @@ public class RequestPatternTest {
     public void testNoMatchNoBody() {
         incomingRequest.setBody(null); // no body
         
-        MatchResult result = instance1.matches(incomingRequest);
+        MatchResult result = instance1.match(incomingRequest);
         
         assertNotFound(result, MatchField.FieldType.BODY, "body", "<pattern>");
     }
@@ -217,7 +217,7 @@ public class RequestPatternTest {
     public void testNoMatchWrongMethod() {
         incomingRequest.setMethod("HEAD");
         
-        MatchResult result = instance1.matches(incomingRequest);
+        MatchResult result = instance1.match(incomingRequest);
         
         assertMatchFailure(result, MatchField.FieldType.METHOD, "method", "PO.*", "HEAD");
     }

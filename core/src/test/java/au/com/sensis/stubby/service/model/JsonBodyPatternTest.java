@@ -110,6 +110,18 @@ public class JsonBodyPatternTest {
     }
     
     @Test
+    public void testBigDecimalMatch() throws Exception { // ensure comparing using 'BigDecimal' for floating point
+        assertPattern("{\"foo\":1.11222333444555666777888999}").matches("{\"foo\":1.11222333444555666777888999}");
+        assertPattern("{\"foo\":1.11222333444555666777888999}").doesNotMatch("{\"foo\":1.11222333444555666777888998}");
+    }
+    
+    @Test
+    public void testBigIntegerMatch() throws Exception { // ensure comparing using 'BigInteger' for large integers
+        assertPattern("{\"foo\":111222333444555666777888999}").matches("{\"foo\":111222333444555666777888999}");
+        assertPattern("{\"foo\":111222333444555666777888999}").doesNotMatch("{\"foo\":111222333444555666777888998}");
+    }
+    
+    @Test
     public void testBooleanMatch() throws Exception {
         assertPattern("{\"foo\":true}").matches("{\"foo\":true}");
         assertPattern("{\"foo\":false}").matches("{\"foo\":false}");

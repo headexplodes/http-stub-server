@@ -3,6 +3,7 @@ package au.com.sensis.stubby.test;
 import org.apache.http.entity.ContentType;
 
 import au.com.sensis.stubby.test.model.JsonExchange;
+import au.com.sensis.stubby.test.model.JsonRequest;
 import au.com.sensis.stubby.test.model.JsonRequestList;
 import au.com.sensis.stubby.test.model.JsonStubbedExchange;
 import au.com.sensis.stubby.test.model.JsonStubbedExchangeList;
@@ -30,12 +31,16 @@ public class Client extends GenericClient {
         return executeGet("/_control/requests").assertOk().getJson(JsonRequestList.class);
     }
 
+    public JsonRequestList findReqests(String query) {
+        return executeGet("/_control/requests?" + query).assertOk().getJson(JsonRequestList.class);
+    }
+    
     public JsonStubbedExchange getResponse(int index) {
         return executeGet("/_control/responses/" + index).assertOk().getJson(JsonStubbedExchange.class);
     }
 
-    public JsonRequestList getRequest(int index) {
-        return executeGet("/_control/requests/" + index).assertOk().getJson(JsonRequestList.class);
+    public JsonRequest getRequest(int index) {
+        return executeGet("/_control/requests/" + index).assertOk().getJson(JsonRequest.class);
     }
 
     public void deleteResponses() {

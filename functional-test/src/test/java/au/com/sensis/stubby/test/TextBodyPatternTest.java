@@ -9,28 +9,28 @@ public class TextBodyPatternTest extends TestBase {
     
     @Test
     public void wildcardPattern() {        
-        builder().path("/foo").status(200).requestBody(".*").stub();
+        builder().setRequestPath("/foo").setResponseStatus(200).setRequestBody(".*").stub();
         
         assertOk(client.executePost("/foo", "test", ContentType.TEXT_PLAIN));
     }
     
     @Test
     public void withPatternMatch() {        
-        builder().path("/foo").status(200).requestBody("foo b.+").stub();
+        builder().setRequestPath("/foo").setResponseStatus(200).setRequestBody("foo b.+").stub();
         
         assertOk(client.executePost("/foo", "foo bar", ContentType.TEXT_PLAIN));
     }
     
     @Test
     public void withPatternNotMatch() {        
-        builder().path("/foo").status(200).requestBody("foo b.+").stub();
+        builder().setRequestPath("/foo").setResponseStatus(200).setRequestBody("foo b.+").stub();
         
         assertNotFound(client.executePost("/foo", "incorrect", ContentType.TEXT_PLAIN));
     }
         
     @Test
     public void notText() {
-        builder().path("/foo").status(200).requestBody(".*").stub();
+        builder().setRequestPath("/foo").setResponseStatus(200).setRequestBody(".*").stub();
         
         assertNotFound(client.executePost("/foo", "test", ContentType.APPLICATION_JSON));
     }

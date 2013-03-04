@@ -1,5 +1,7 @@
 package au.com.sensis.stubby.test.support;
 
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -15,6 +17,8 @@ import org.junit.Before;
 import au.com.sensis.stubby.test.Client;
 import au.com.sensis.stubby.test.GenericClientResponse;
 import au.com.sensis.stubby.test.MessageBuilder;
+import au.com.sensis.stubby.test.model.JsonMessage;
+import au.com.sensis.stubby.test.model.JsonPair;
 import au.com.sensis.stubby.test.model.JsonStubbedExchangeList;
 
 public abstract class TestBase {
@@ -95,6 +99,16 @@ public abstract class TestBase {
 
     protected MessageBuilder builder() {
         return new MessageBuilder(client);
+    }
+        
+    protected void assertHasHeader(JsonMessage request, String name, String value) {
+        for (JsonPair header : request.headers) {
+            if (header.name.equalsIgnoreCase(name)
+                    && header.value.equals(value)) {
+                return;
+            }
+        }
+        fail();
     }
 
 }

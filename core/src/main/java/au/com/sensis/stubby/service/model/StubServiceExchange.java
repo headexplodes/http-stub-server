@@ -24,7 +24,7 @@ public class StubServiceExchange { // wrap exchange model with some extra runtim
     }
     
     public MatchResult matches(StubRequest message) throws URISyntaxException {
-        MatchResult result = requestPattern.matches(message);
+        MatchResult result = requestPattern.match(message);
         for (MatchField field : result.getFields()) {
             LOGGER.trace("Match outcome: " + field);
         }

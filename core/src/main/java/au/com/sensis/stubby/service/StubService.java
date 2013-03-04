@@ -3,7 +3,6 @@ package au.com.sensis.stubby.service;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
 
@@ -12,6 +11,7 @@ import au.com.sensis.stubby.js.ScriptWorld;
 import au.com.sensis.stubby.model.StubExchange;
 import au.com.sensis.stubby.model.StubRequest;
 import au.com.sensis.stubby.service.model.MatchResult;
+import au.com.sensis.stubby.service.model.RequestPattern;
 import au.com.sensis.stubby.service.model.StubServiceExchange;
 import au.com.sensis.stubby.service.model.StubServiceResult;
 import au.com.sensis.stubby.utils.JsonUtils;
@@ -62,7 +62,7 @@ public class StubService {
     public synchronized StubServiceExchange getResponse(int index) throws NotFoundException {
         try {
             return responses.get(index);
-        } catch (NoSuchElementException e) {
+        } catch (IndexOutOfBoundsException e) {
             throw new NotFoundException("Response does not exist: " + index);
         }
     }
@@ -75,7 +75,7 @@ public class StubService {
         LOGGER.trace("Deleting response: " + index);
         try {
             responses.remove(index);
-        } catch (NoSuchElementException e) {
+        } catch (IndexOutOfBoundsException e) {
             throw new RuntimeException("Response does not exist: " + index);
         }
     }
@@ -88,14 +88,21 @@ public class StubService {
     public synchronized StubRequest getRequest(int index) throws NotFoundException {
         try {
             return requests.get(index);
-        } catch (NoSuchElementException e) {
+        } catch (IndexOutOfBoundsException e) {
             throw new NotFoundException("Response does not exist: " + index);
         }
     }
     
-//    public synchronized List<StubRequest> findRequest(RequestFilter filter) {
-//        // TODO
-//    }
+    public synchronized List<StubRequest> findRequests(StubRequest filter) {
+        RequestPattern pattern = new RequestPattern(filter);
+        List<StubRequest> result = new ArrayList<StubRequest>();
+        for (StubRequest request : requests) {
+            if (pattern.match(request).matches()) {
+                result.add(request);
+            }
+        }
+        return result;
+    }
 
     public synchronized List<StubRequest> getRequests() {
         return requests;
@@ -105,7 +112,7 @@ public class StubService {
         LOGGER.trace("Deleting request: " + index);
         try {
             requests.remove(index);
-        } catch (NoSuchElementException e) {
+        } catch (IndexOutOfBoundsException e) {
             throw new NotFoundException("Request does not exist: " + index);
         }
     }

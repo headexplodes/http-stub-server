@@ -16,7 +16,7 @@ public class DuplicateRequestPatternTest extends TestBase {
     private void assertSame(MessageBuilder... messages) {
         int status = 1; // use status code to identify requests
         for (MessageBuilder message : messages) {
-            message.status(status).stub();
+            message.setResponseStatus(status).stub();
 
             JsonStubbedExchangeList responses = responses();
             assertEquals(1, responses.size());
@@ -29,7 +29,7 @@ public class DuplicateRequestPatternTest extends TestBase {
     private void assertNotSame(MessageBuilder... messages) {
         int status = 1; // use status code to identify requests
         for (MessageBuilder message : messages) {
-            message.status(status).stub();
+            message.setResponseStatus(status).stub();
 
             JsonStubbedExchangeList responses = responses();
             assertEquals(status, responses.size()); // size should grow
@@ -42,29 +42,29 @@ public class DuplicateRequestPatternTest extends TestBase {
     @Test
     public void pathSame() {
         assertSame(
-                builder().path("/foo"),
-                builder().path("/foo"));
+                builder().setRequestPath("/foo"),
+                builder().setRequestPath("/foo"));
     }
     
     @Test
     public void pathDiffers() {
         assertNotSame(
-                builder().path("/foo1"),
-                builder().path("/foo2"));
+                builder().setRequestPath("/foo1"),
+                builder().setRequestPath("/foo2"));
     }
     
     @Test
     public void querySame() {
         assertSame(
-                builder().path("/foo").query("foo", "bar"),
-                builder().path("/foo").query("foo", "bar"));
+                builder().setRequestPath("/foo").addRequestParam("foo", "bar"),
+                builder().setRequestPath("/foo").addRequestParam("foo", "bar"));
     }    
     
     @Test
     public void queryDiffers() {
         assertNotSame(
-                builder().path("/foo").query("foo", "bar1"),
-                builder().path("/foo").query("foo", "bar2"));
+                builder().setRequestPath("/foo").addRequestParam("foo", "bar1"),
+                builder().setRequestPath("/foo").addRequestParam("foo", "bar2"));
     }
 
 }

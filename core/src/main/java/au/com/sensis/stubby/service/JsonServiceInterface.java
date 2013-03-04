@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import au.com.sensis.stubby.model.StubExchange;
+import au.com.sensis.stubby.model.StubRequest;
 import au.com.sensis.stubby.utils.JsonUtils;
 
 public class JsonServiceInterface { // interface using serialized JSON strings/streams
@@ -60,6 +61,14 @@ public class JsonServiceInterface { // interface using serialized JSON strings/s
     
     public void getRequests(OutputStream stream) {
         JsonUtils.serialize(stream, service.getRequests());
+    }
+    
+    public String findRequest(StubRequest filter) throws NotFoundException {
+        return JsonUtils.serialize(service.findRequests(filter));
+    }
+    
+    public void findRequest(OutputStream stream, StubRequest filter) throws NotFoundException {
+        JsonUtils.serialize(stream, service.findRequests(filter));
     }
 
     public void deleteRequest(int index) throws NotFoundException {

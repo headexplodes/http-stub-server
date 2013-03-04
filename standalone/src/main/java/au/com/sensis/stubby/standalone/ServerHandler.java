@@ -1,17 +1,21 @@
 package au.com.sensis.stubby.standalone;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 
+import au.com.sensis.stubby.model.StubParam;
+import au.com.sensis.stubby.model.StubRequest;
 import au.com.sensis.stubby.service.JsonServiceInterface;
 import au.com.sensis.stubby.service.NotFoundException;
 import au.com.sensis.stubby.service.StubService;
 import au.com.sensis.stubby.service.model.StubServiceResult;
 import au.com.sensis.stubby.utils.JsonUtils;
+import au.com.sensis.stubby.utils.RequestFilterBuilder;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -139,7 +143,7 @@ public class ServerHandler implements HttpHandler {
             throw new RuntimeException("Unsupported method: " + method);
         }
     }
-
+    
     private void handleResponse(HttpExchange exchange, int index) throws IOException {
         String method = exchange.getRequestMethod();
         if (method.equals("GET")) {
@@ -159,7 +163,7 @@ public class ServerHandler implements HttpHandler {
             service.deleteRequests();
             returnOk(exchange);
         } else if (method.equals("GET")) {
-            returnJson(exchange, service.getRequests());
+            returnJson(exchange, service.findRequests(createFilter(exchange)));
         } else {
             throw new RuntimeException("Unsupported method: " + method);
         }
@@ -177,7 +181,12 @@ public class ServerHandler implements HttpHandler {
             throw new RuntimeException("Unsupported method: " + method);
         }
     }
-
+    
+    private StubRequest createFilter(HttpExchange exchange) {
+        List<StubParam> params = Transformer.fromExchangeParams(exchange);
+        return new RequestFilterBuilder().fromParams(params).getFilter();
+    }
+    
     private void handleShutdown(HttpExchange exchange) throws IOException {
         if (shutdownHook != null) {
             LOGGER.info("Received shutdown request, attempting to shutdown gracefully...");

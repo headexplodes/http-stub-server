@@ -8,17 +8,17 @@ import org.junit.Test;
 
 import au.com.sensis.stubby.test.support.TestBase;
 
-public class ResponseTest extends TestBase {
+public class MatchResponseTest extends TestBase {
     
     @Test
     public void testAllFields() {
         builder()
-            .path("/.*")
-            .status(201)
+            .setRequestPath("/.*")
+            .setResponseStatus(201)
             .addResponseHeader("X-Foo", "bar1")
             .addResponseHeader("X-Foo", "bar2") // two values for single name
             .addResponseHeader("x-foo", "bar3; bar4") // check case-insensitivity
-            .responseBody("response body")
+            .setResponseBody("response body")
             .stub(); 
         
         GenericClientResponse response = client.executeGet("/test");

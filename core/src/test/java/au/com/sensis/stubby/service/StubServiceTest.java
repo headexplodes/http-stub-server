@@ -4,10 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import au.com.sensis.stubby.model.StubExchange;
+import au.com.sensis.stubby.model.StubParam;
 import au.com.sensis.stubby.model.StubRequest;
 import au.com.sensis.stubby.model.StubResponse;
 import au.com.sensis.stubby.service.model.StubServiceExchange;
@@ -161,5 +164,27 @@ public class StubServiceTest {
         assertEquals(CREATED, // ensure last stubbed request is kept
                 service.getResponses().get(0).getExchange().getResponse().getStatus());
     }
-
+    
+    @Test
+    public void testRequestFilterEmpty() {
+        request.setPath("/test");
+        service.findMatch(new StubRequest(request));
+        assertEquals(1, service.findRequests(new StubRequest()).size()); // empty filter
+    }
+    
+    @Test
+    public void testRequestFilter() {
+        request.setPath("/test");
+        service.findMatch(new StubRequest(request));
+        
+        request.setPath("/test");
+        request.setParams(Arrays.asList(new StubParam("foo", "bar")));
+        service.findMatch(new StubRequest(request));
+        
+        assertEquals(2, service.getRequests().size());
+        
+        StubRequest filter = new StubRequest();
+        filter.setParams(Arrays.asList(new StubParam("foo", "b.r")));
+        assertEquals(1, service.findRequests(filter).size()); // should only match one of the requests
+    }
 }
