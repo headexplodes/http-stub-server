@@ -1,6 +1,7 @@
 package au.com.sensis.stubby.test.support;
 
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -109,6 +110,14 @@ public abstract class TestBase {
             }
         }
         fail();
+    }
+    
+    protected void assumeNotTravisCi() {
+        assumeFalse("Running as Travis CI", isTravisCi());
+    }
+    
+    protected boolean isTravisCi() { // set when running under Travis CI (travis-ci.org)
+        return "true".equals(System.getenv("TRAVIS"));
     }
 
 }
