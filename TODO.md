@@ -13,3 +13,5 @@ Github TODO:
  - Add Ruby client code
  - Add some downloadable artefacts?
  - Document JavaScript support
+ - Document filtering support (/_control/requests?method=GET&path=...)
+
