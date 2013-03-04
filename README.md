@@ -1,6 +1,8 @@
 Generic HTTP Stub
 =================
 
+[![Build Status](https://travis-ci.org/headexplodes/http-stub-server.png)](https://travis-ci.org/headexplodes/http-stub-server)
+
 The Generic HTTP Stub Server (a.k.a. 'Stubby') is a protocol and server implementation for stubbing HTTP interactions, mainly aimed at automated acceptance testing. There's also some example client code in various languages.
 
 ## Overview
