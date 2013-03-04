@@ -153,6 +153,8 @@ public class JsonBodyPatternTest {
         assertPattern("{\"foo\":{\"bar\":[]}}").matches("{\"foo\":{\"bar\":[]}}");
         assertPattern("{\"foo\":{\"bar\":[]}}").matches("{\"foo\":{\"bar\":[{}]}}");
         assertPattern("{\"foo\":{\"bar\":[]}}").doesNotMatch("{\"foo\":{\"bar\":{}}}");
+        assertPattern("{\"foo\":{\"bar1\":true,\"bar2\":false}}").doesNotMatch("{\"foo\":{\"bar1\":true,\"bar2\":true}}"); // second nested property differs
+        assertPattern("{\"foo\":{\"bar1\":true,\"bar2\":true}}").matches("{\"foo\":{\"bar1\":true,\"bar2\":true}}"); // second nested property is the same
     }
     
 }

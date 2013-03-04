@@ -85,7 +85,10 @@ public class JsonBodyPattern extends BodyPattern {
      */
     private MatchResult matchObject(Map<String, Object> pattern, Map<String, Object> request, String path) {
         for (String key : pattern.keySet()) {
-            return matchValue(pattern.get(key), request.get(key), path + "." + key);
+            MatchResult result = matchValue(pattern.get(key), request.get(key), path + "." + key);
+            if (!result.isMatch()) {
+                return result; // abort on first failure
+            }
         }
         return matchSuccess(); // empty pattern matches any object
     }
