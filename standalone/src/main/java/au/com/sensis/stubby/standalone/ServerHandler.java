@@ -40,6 +40,11 @@ public class ServerHandler implements HttpHandler {
     public void handle(HttpExchange exchange) {
         long start = System.currentTimeMillis();
         try {
+            // force clients to close connection to work around issue with Keep-Alive in HttpServer (Java 7)
+            // see: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=8009548
+            // TODO: should probably use another HTTP server (not the 'com.sun' one)
+            exchange.getResponseHeaders().set("Connection", "close");
+
             String path = exchange.getRequestURI().getPath();
             if (path.startsWith("/_control/")) {
                 handleControl(exchange);
