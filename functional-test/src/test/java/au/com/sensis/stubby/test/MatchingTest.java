@@ -31,6 +31,14 @@ public class MatchingTest extends TestBase {
         builder().setRequestPath("/.*").setResponseStatus(200).addRequestParam("foo", "b..").stub();  // ensure regular expressions supported
         assertOk(client.executeGet("/test?foo=bar&FOO=bar")); // ensure ignores extra parameters, and case sensitive
     }
+
+    @Test
+    public void matchBlankQueryParameter() {
+        builder().setRequestPath("/.*").setResponseStatus(200).addRequestParam("foo", ".*").stub();
+        assertOk(client.executeGet("/test?foo=")); // should match empty parameter
+        assertNotFound(client.executeGet("/test")); // should not match if parameter not given
+    }
+
     @Test
     public void matchMissingParameter() {
         builder().setRequestPath("/.*").setResponseStatus(200).addRequestParam("foo", "b..").stub();

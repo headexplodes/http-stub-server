@@ -13,7 +13,7 @@ public class DelayTest extends TestBase {
         assumeNotTravisCi(); // skip test: Travis CI is really slow, and this test usually fails.
         
         long millis = 2000;
-        long tollerance = 500;
+        long tolerance = 500;
         
         builder().setRequestPath("/foo").setResponseStatus(200).setDelay(millis).stub();
         
@@ -21,7 +21,7 @@ public class DelayTest extends TestBase {
         assertOk(client.executeGet("/foo"));
         long ended = System.currentTimeMillis();
         
-        assertEquals(millis, Math.abs(ended-started), tollerance); // assert delay within tollerance
+        assertEquals(millis, Math.abs(ended-started), tolerance); // assert delay within tolerance
     }
 
 }
