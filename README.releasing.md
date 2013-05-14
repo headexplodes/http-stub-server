@@ -20,9 +20,10 @@ Update the Maven POMs:
 
 ### 3. Push the branch back to GitHub
 
-Remember to add the changed POMs first.
+Remember to add and commit the changed POMs first.
 
     $ git add .
+    $ git commit -m "Branched for release 1.23"
     $ git push origin release-1.23
 
 ### 4. (Optional) Deploy to your local artifact repository
