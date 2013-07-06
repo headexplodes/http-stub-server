@@ -87,7 +87,7 @@ public class RequestPatternTest {
         assertEquals("foo", instance1.getParams().iterator().next().getName());
         assertEquals("b.r", instance1.getParams().iterator().next().getPattern().pattern());
         
-        assertEquals(1, instance1.getParams().size());
+        assertEquals(1, instance1.getHeaders().size());
         assertEquals("Content-Type", instance1.getHeaders().iterator().next().getName());
         assertEquals("text/plain; .+", instance1.getHeaders().iterator().next().getPattern().pattern());
         
