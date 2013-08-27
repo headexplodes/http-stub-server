@@ -22,7 +22,7 @@ public class JsonBodyPatternTest extends TestBase {
     
     @Test
     public void withPatternMatch() {
-        Map pattern = new HashMap();
+        Map<String,String> pattern = new HashMap<String,String>();
         pattern.put("key_a", "value_a");
         
         builder().setRequestPath("/foo").setResponseStatus(200).setRequestBody(pattern).stub();
@@ -32,7 +32,7 @@ public class JsonBodyPatternTest extends TestBase {
     
     @Test
     public void withPatternNotMatch() {
-        Map pattern = new HashMap();
+        Map<String,String> pattern = new HashMap<String,String>();
         pattern.put("key_a", "incorrect");
         
         builder().setRequestPath("/foo").setResponseStatus(200).setRequestBody(pattern).stub();

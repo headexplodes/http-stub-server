@@ -1,7 +1,5 @@
 package au.com.sensis.stubby.test;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
 import au.com.sensis.stubby.test.support.TestBase;

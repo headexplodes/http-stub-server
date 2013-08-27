@@ -1,20 +1,15 @@
 package au.com.sensis.stubby.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 
-import au.com.sensis.stubby.model.StubRequest;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.http.client.methods.HttpPost;
 import org.junit.Before;
 import org.junit.Test;
 
 import au.com.sensis.stubby.test.model.JsonRequestList;
 import au.com.sensis.stubby.test.support.TestBase;
-
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class FindRequestTest extends TestBase {
     
