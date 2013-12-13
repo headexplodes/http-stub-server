@@ -1,7 +1,9 @@
 package au.com.sensis.stubby.standalone;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -103,6 +105,8 @@ public class ServerHandler implements HttpHandler {
                     handleResponses(exchange);
                 } else if (object.equals("shutdown")) {
                     handleShutdown(exchange);
+                } else if (object.equals("version")) {
+                    handleVersion(exchange);
                 } else {
                     throw new RuntimeException("Unknown object: " + object);
                 }
@@ -215,6 +219,17 @@ public class ServerHandler implements HttpHandler {
         } else {
             LOGGER.error("Received shutdown request, but don't know how to shutdown gracefully! (ignoring)");
             returnError(exchange, "Graceful shutdown not supported");
+        }
+    }
+    
+    private void handleVersion(HttpExchange exchange) throws IOException {
+        InputStream stream = getClass().getResourceAsStream("/au/com/sensis/stubby/standalone/version.properties");
+        try {
+            Properties props = new Properties();
+            props.load(stream);
+            returnJson(exchange, props);
+        } finally {
+            stream.close();
         }
     }
 

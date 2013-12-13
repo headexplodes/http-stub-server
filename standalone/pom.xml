@@ -27,6 +27,16 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <targetPath>au/com/sensis/stubby/standalone</targetPath>
+                <filtering>true</filtering>
+                <directory>${basedir}/src/main/resources-filtered</directory>
+                <includes>
+                    <include>version.properties</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
