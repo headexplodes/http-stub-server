@@ -126,6 +126,14 @@ The stub server has a number of endpoints for adding stub data, verifying reques
 * `DELETE /_control/responses`
 
   Deletes all stubbed requests.
+  
+* `GET /_control/shutdown`
+
+  Performs and orderly shutdown of the server.
+  
+* `GET /_control/version`
+
+  Returns the application version. Useful as a URL for checking that the server is alive.
 
 ### Message Formats
 
