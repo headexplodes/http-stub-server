@@ -5,8 +5,8 @@ Generic HTTP Stub
 
 The Generic HTTP Stub Server (a.k.a. 'Stubby') is a protocol and server implementation for stubbing HTTP interactions, mainly aimed at automated acceptance testing. There's also some example client code in various languages.
 
-  **Note:**
-  This project is largely unmaintained. I'm happy to accept bug fixes but no new features are being added. I recommend you check out [WireMock](http://wiremock.org/), a very similar tool and actively maintained (well, at the the time of writing at least).
+> **Note:**
+> This project is largely unmaintained. I'm happy to accept bug fixes but no new features are being added. I recommend you check out [WireMock](http://wiremock.org/), a very similar tool and actively maintained (well, at the the time of writing at least).
 
 ## Overview
 
